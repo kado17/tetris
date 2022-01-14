@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 const COLORS = ['aqua', 'yellow', 'purple', 'blue', 'orange', 'green']
@@ -37,12 +37,13 @@ const StateBoard = styled.div`
   background-color: #aaa;
   border: 1vh solid #666;
 `
-const TetrominoSquare = styled.div`
+const TetrominoSquare = styled.div<{ num: number }>`
   display: inline-block;
   width: 4vh;
   height: 4vh;
   vertical-align: bottom;
-  background-color: #111;
+  background-color: ${(props) =>
+    1 <= props.num && props.num <= 6 ? COLORS[props.num - 1] : '#111'};
   border: 0.05vh solid #999;
 `
 
@@ -76,26 +77,37 @@ const Home: NextPage = () => {
       [0, 1, 0],
       [1, 1, 1],
     ],
-    color: COLORS[2],
   }
   const [board, setBoard] = useState(startBoard)
   const [tetromino, setTetromino] = useState(startTetromino)
   const [timer, setTimer] = useState(0)
-
+  const viewBoard = useMemo(() => {
+    const newBoard: number[][] = JSON.parse(JSON.stringify(board))
+    for (let y = 0; y < tetromino.block.length; y++) {
+      for (let x = 0; x < tetromino.block[y].length; x++) {
+        newBoard[y + tetromino.top][x + tetromino.left] = tetromino.block[y][x]
+      }
+    }
+    console.log(newBoard)
+    return newBoard
+  }, [tetromino])
   useEffect(() => {
     const id = setInterval(() => {
-      setTimer((t) => t + 1)
+      const nowTetromino = tetromino
+      if (tetromino.top + tetromino.block.length < 20)
+        setTetromino({ ...nowTetromino, top: nowTetromino.top + 1 })
     }, 1000)
     return () => {
       clearInterval(id)
     }
-  }, [])
+  }, [viewBoard])
+
   return (
     <Container>
       <Board>
         <GameBoard>
-          {board.map((row, y) =>
-            row.map((num, x) => <TetrominoSquare key={`${x}-${y}`}></TetrominoSquare>)
+          {viewBoard.map((row, y) =>
+            row.map((num, x) => <TetrominoSquare key={`${x}-${y}`} num={num}></TetrominoSquare>)
           )}
         </GameBoard>
         <StateBoard></StateBoard>
