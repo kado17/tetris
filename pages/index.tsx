@@ -80,7 +80,9 @@ const Home: NextPage = () => {
   }
   const [board, setBoard] = useState(startBoard)
   const [tetromino, setTetromino] = useState(startTetromino)
+  const [pressKey, setPressKey] = useState(0)
   const [timer, setTimer] = useState(0)
+
   const viewBoard = useMemo(() => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     for (let y = 0; y < tetromino.block.length; y++) {
@@ -88,15 +90,43 @@ const Home: NextPage = () => {
         newBoard[y + tetromino.top][x + tetromino.left] = tetromino.block[y][x]
       }
     }
-    console.log(newBoard)
     return newBoard
-  }, [tetromino])
+  }, [timer])
+
+  const checkKeyDown = (event: KeyboardEvent) => {
+    console.log(111, event.key)
+    if (event.key === 'ArrowRight') {
+      setPressKey(1)
+    } else {
+      setPressKey(0)
+    }
+  }
+
+  useEffect(() => {
+    document.addEventListener('keydown', checkKeyDown, false)
+    return () => {
+      document.removeEventListener('keydown', checkKeyDown, false)
+    }
+  }, [timer])
+
   useEffect(() => {
     const id = setInterval(() => {
-      const nowTetromino = tetromino
-      if (tetromino.top + tetromino.block.length < 20)
-        setTetromino({ ...nowTetromino, top: nowTetromino.top + 1 })
-    }, 1000)
+      setTimer((t) => t + 1)
+      const newTetromino = tetromino
+      if (pressKey !== 0) {
+        if (pressKey === 1 && tetromino.left + tetromino.block[0].length < 10) {
+          newTetromino.left++
+        }
+        setPressKey(0)
+      } else {
+        if (tetromino.top + tetromino.block.length < 20) {
+          newTetromino.top++
+        }
+      }
+      console.log(pressKey)
+
+      setTetromino(newTetromino)
+    }, 700)
     return () => {
       clearInterval(id)
     }
