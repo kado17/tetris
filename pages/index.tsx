@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 const COLORS = ['aqua', 'yellow', 'purple', 'blue', 'orange', 'green']
@@ -80,8 +80,8 @@ const Home: NextPage = () => {
   }
   const [board, setBoard] = useState(startBoard)
   const [tetromino, setTetromino] = useState(startTetromino)
-  const [pressKey, setPressKey] = useState(0)
-  const [timer, setTimer] = useState(0)
+  const [pressKey, setPressKey] = useState(false)
+  const [effect, setEffect] = useState(false)
 
   const viewBoard = useMemo(() => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
@@ -91,46 +91,42 @@ const Home: NextPage = () => {
       }
     }
     return newBoard
-  }, [timer])
+  }, [effect, pressKey])
 
-  const checkKeyDown = (event: KeyboardEvent) => {
-    console.log(111, event.key)
-    if (event.key === 'ArrowRight') {
-      setPressKey(1)
-    } else {
-      setPressKey(0)
-    }
-  }
+  const checkKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      console.log(111, event.key, tetromino)
+      if (event.key === 'ArrowRight' && tetromino.left + tetromino.block[0].length < 10) {
+        setTetromino({ ...tetromino, left: tetromino.left + 1 })
+        setPressKey(!pressKey)
+      } else if (event.key === 'ArrowLeft' && 0 < tetromino.left) {
+        setTetromino({ ...tetromino, left: tetromino.left - 1 })
+        setPressKey(!pressKey)
+      }
+    },
+    [pressKey, effect]
+  )
 
   useEffect(() => {
     document.addEventListener('keydown', checkKeyDown, false)
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
-  }, [timer])
+  }, [pressKey, effect])
 
   useEffect(() => {
+    console.log(222, tetromino)
+    if (tetromino.top + tetromino.block.length < 20) {
+      setTetromino({ ...tetromino, top: tetromino.top + 1 })
+    }
+    console.log(333, tetromino)
     const id = setInterval(() => {
-      setTimer((t) => t + 1)
-      const newTetromino = tetromino
-      if (pressKey !== 0) {
-        if (pressKey === 1 && tetromino.left + tetromino.block[0].length < 10) {
-          newTetromino.left++
-        }
-        setPressKey(0)
-      } else {
-        if (tetromino.top + tetromino.block.length < 20) {
-          newTetromino.top++
-        }
-      }
-      console.log(pressKey)
-
-      setTetromino(newTetromino)
-    }, 700)
+      setEffect(!effect)
+    }, 500)
     return () => {
       clearInterval(id)
     }
-  }, [viewBoard])
+  }, [effect])
 
   return (
     <Container>
