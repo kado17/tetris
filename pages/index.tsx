@@ -63,16 +63,16 @@ const Home: NextPage = () => {
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 3, 3, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
+    [0, 0, 0, 0, 0, 0, 0, 0, 4, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0, 4, 2],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   ]
   const startTetromino = [
-    [0, 1, 0],
-    [1, 1, 1],
+    [1, 1, 0],
+    [0, 1, 1],
   ]
 
   const [board, setBoard] = useState(startBoard)
@@ -85,33 +85,38 @@ const Home: NextPage = () => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     for (let y = 0; y < tetromino.length; y++) {
       for (let x = 0; x < tetromino[y].length; x++) {
-        newBoard[y + tetrominoY][x + tetrominoX] = tetromino[y][x]
+        if (tetromino[y][x]) {
+          newBoard[y + tetrominoY][x + tetrominoX] = tetromino[y][x]
+        }
       }
     }
     return newBoard
   }, [tetrominoX, tetrominoY])
 
+  const checkCollision = (movedX: number, movedY: number) => {
+    if (10 < movedX + tetromino[0].length || movedX < 0 || 20 < movedY + tetromino.length) {
+      return true
+    }
+    const newBoard: number[][] = JSON.parse(JSON.stringify(board))
+    for (let i = 0; i < tetromino.length; i++) {
+      for (let j = 0; j < tetromino[i].length; j++) {
+        if (tetromino[i][j] > 0 && newBoard[i + movedY][j + movedX] > 0) {
+          return true
+        }
+      }
+    }
+    return false
+  }
+
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      console.log(111, event.key, tetromino, tetrominoX + tetromino[0].length, tetrominoX)
+      console.log(111, event.key, tetrominoX, tetrominoY)
       switch (event.key) {
         case 'ArrowRight':
-          setTetrominoX((e) => {
-            if (e + tetromino[0].length < 10) {
-              return e + 1
-            } else {
-              return e
-            }
-          })
+          setTetrominoX((e) => (checkCollision(e + 1, tetrominoY) ? e : e + 1))
           break
         case 'ArrowLeft':
-          setTetrominoX((e) => {
-            if (0 < e) {
-              return e - 1
-            } else {
-              return e
-            }
-          })
+          setTetrominoX((e) => (checkCollision(e - 1, tetrominoY) ? e : e - 1))
           break
       }
     },
@@ -126,15 +131,10 @@ const Home: NextPage = () => {
   }, [effect])
 
   useEffect(() => {
-    console.log(222, tetromino)
-    if (tetrominoY + tetromino.length < 20) {
-      setTetrominoY((e) => e + 1)
-      console.log(999)
-    }
-    console.log(333, tetromino)
     const id = setInterval(() => {
       setEffect(!effect)
     }, 500)
+    setTetrominoY((e) => (checkCollision(tetrominoX, e + 1) ? e : e + 1))
     return () => {
       clearInterval(id)
     }
