@@ -71,8 +71,8 @@ const Home: NextPage = () => {
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   ]
   const startTetromino = [
-    [1, 1, 0],
-    [0, 1, 1],
+    [1, 1, 1],
+    [0, 1, 0],
   ]
 
   const [board, setBoard] = useState(startBoard)
@@ -80,6 +80,7 @@ const Home: NextPage = () => {
   const [tetrominoX, setTetrominoX] = useState(0)
   const [tetrominoY, setTetrominoY] = useState(0)
   const [effect, setEffect] = useState(false)
+  const [isMovingTetromino, setIsMovingTetromino] = useState(true)
 
   const viewBoard = useMemo(() => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
@@ -95,17 +96,17 @@ const Home: NextPage = () => {
 
   const checkCollision = (movedX: number, movedY: number) => {
     if (10 < movedX + tetromino[0].length || movedX < 0 || 20 < movedY + tetromino.length) {
-      return true
+      return false
     }
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     for (let i = 0; i < tetromino.length; i++) {
       for (let j = 0; j < tetromino[i].length; j++) {
         if (tetromino[i][j] > 0 && newBoard[i + movedY][j + movedX] > 0) {
-          return true
+          return false
         }
       }
     }
-    return false
+    return true
   }
 
   const checkKeyDown = useCallback(
@@ -113,10 +114,10 @@ const Home: NextPage = () => {
       console.log(111, event.key, tetrominoX, tetrominoY)
       switch (event.key) {
         case 'ArrowRight':
-          setTetrominoX((e) => (checkCollision(e + 1, tetrominoY) ? e : e + 1))
+          setTetrominoX((e) => (checkCollision(e + 1, tetrominoY + 1) ? e + 1 : e))
           break
         case 'ArrowLeft':
-          setTetrominoX((e) => (checkCollision(e - 1, tetrominoY) ? e : e - 1))
+          setTetrominoX((e) => (checkCollision(e - 1, tetrominoY + 1) ? e - 1 : e))
           break
       }
     },
@@ -132,9 +133,12 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     const id = setInterval(() => {
+      console.log(tetrominoX, tetrominoY, 333)
       setEffect(!effect)
-    }, 500)
-    setTetrominoY((e) => (checkCollision(tetrominoX, e + 1) ? e : e + 1))
+    }, 300)
+    if (checkCollision(tetrominoX, tetrominoY + 1)) {
+      setTetrominoY(tetrominoY + 1)
+    }
     return () => {
       clearInterval(id)
     }
