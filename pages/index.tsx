@@ -81,6 +81,7 @@ const Home: NextPage = () => {
   const [tetrominoY, setTetrominoY] = useState(0)
   const [effect, setEffect] = useState(false)
   const [isMovingTetromino, setIsMovingTetromino] = useState(true)
+  const [restCount, setRestCount] = useState(0)
 
   const viewBoard = useMemo(() => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
@@ -94,8 +95,13 @@ const Home: NextPage = () => {
     return newBoard
   }, [tetrominoX, tetrominoY])
 
-  const checkCollision = (movedX: number, movedY: number) => {
-    if (10 < movedX + tetromino[0].length || movedX < 0 || 20 < movedY + tetromino.length) {
+  const checkCollision = (movedX: number, movedY: number, isCallByY = false) => {
+    if (isCallByY) {
+      if (19 < tetrominoY + tetromino.length) {
+        return false
+      }
+    }
+    if (10 < movedX + tetromino[0].length || movedX < 0) {
       return false
     }
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
@@ -114,14 +120,14 @@ const Home: NextPage = () => {
       console.log(111, event.key, tetrominoX, tetrominoY)
       switch (event.key) {
         case 'ArrowRight':
-          setTetrominoX((e) => (checkCollision(e + 1, tetrominoY + 1) ? e + 1 : e))
+          setTetrominoX((e) => (checkCollision(e + 1, tetrominoY) ? e + 1 : e))
           break
         case 'ArrowLeft':
-          setTetrominoX((e) => (checkCollision(e - 1, tetrominoY + 1) ? e - 1 : e))
+          setTetrominoX((e) => (checkCollision(e - 1, tetrominoY) ? e - 1 : e))
           break
       }
     },
-    [effect]
+    [tetrominoY]
   )
 
   useEffect(() => {
@@ -129,16 +135,20 @@ const Home: NextPage = () => {
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
-  }, [effect])
+  }, [tetrominoY])
 
   useEffect(() => {
+    console.log(tetrominoY)
+    if (checkCollision(tetrominoX, tetrominoY + 1, true)) {
+      setTetrominoY(tetrominoY + 1)
+    } else {
+      setRestCount((e) => e + 1)
+    }
     const id = setInterval(() => {
       console.log(tetrominoX, tetrominoY, 333)
       setEffect(!effect)
     }, 300)
-    if (checkCollision(tetrominoX, tetrominoY + 1)) {
-      setTetrominoY(tetrominoY + 1)
-    }
+
     return () => {
       clearInterval(id)
     }
