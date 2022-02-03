@@ -71,9 +71,11 @@ const Home: NextPage = () => {
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
   ]
   const startTetromino = [
-    [1, 1, 1],
     [0, 1, 0],
+    [1, 1, 1],
   ]
+
+  const tetrominoList = [[], 0]
 
   const [board, setBoard] = useState(startBoard)
   const [tetromino, setTetromino] = useState(startTetromino)
@@ -83,7 +85,7 @@ const Home: NextPage = () => {
   const [isMovingTetromino, setIsMovingTetromino] = useState(true)
   const [restCount, setRestCount] = useState(0)
 
-  const viewBoard = useMemo(() => {
+  const overlayBoard = () => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     for (let y = 0; y < tetromino.length; y++) {
       for (let x = 0; x < tetromino[y].length; x++) {
@@ -93,21 +95,25 @@ const Home: NextPage = () => {
       }
     }
     return newBoard
-  }, [tetrominoX, tetrominoY])
+  }
 
-  const checkCollision = (movedX: number, movedY: number, isCallByY = false) => {
+  const viewBoard = useMemo(() => {
+    return overlayBoard()
+  }, [tetrominoX, tetrominoY, tetromino])
+
+  const checkCollision = (movedX: number, movedY: number, mino: number[][], isCallByY = false) => {
     if (isCallByY) {
-      if (19 < tetrominoY + tetromino.length) {
+      if (19 < tetrominoY + mino.length) {
         return false
       }
     }
-    if (10 < movedX + tetromino[0].length || movedX < 0) {
+    if (10 < movedX + mino[0].length || movedX < 0) {
       return false
     }
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    for (let i = 0; i < tetromino.length; i++) {
-      for (let j = 0; j < tetromino[i].length; j++) {
-        if (tetromino[i][j] > 0 && newBoard[i + movedY][j + movedX] > 0) {
+    for (let y = 0; y < mino.length; y++) {
+      for (let x = 0; x < mino[y].length; x++) {
+        if (mino[y][x] > 0 && newBoard[y + movedY][x + movedX] > 0) {
           return false
         }
       }
@@ -115,15 +121,50 @@ const Home: NextPage = () => {
     return true
   }
 
+  const rotateRight = (mino: number[][]) => {
+    const newMino = mino[0].map((_, c) => mino.map((r) => r[c]).reverse())
+    const result = {
+      newMino: newMino,
+      heightAdjust: newMino.length > mino.length ? newMino.length - mino.length : 0,
+    }
+    console.log(newMino, result)
+    return result
+  }
+
+  const afterFall = () => {
+    setBoard(overlayBoard())
+    setTetromino([[1, 1, 1, 1]])
+    setTetrominoX(0)
+    setTetrominoY(0)
+    setIsMovingTetromino(true)
+  }
+
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      console.log(111, event.key, tetrominoX, tetrominoY)
       switch (event.key) {
+        case 'ArrowUp': {
+          console.log('UP')
+          const rotatedMino = rotateRight(tetromino)
+          console.log(rotatedMino)
+          if (
+            checkCollision(
+              tetrominoX,
+              tetrominoY - rotatedMino.heightAdjust,
+              rotatedMino.newMino,
+              true
+            )
+          ) {
+            console.log('TRUE', rotatedMino.newMino)
+            //setTetrominoY((e) => e - rotatedMino.heightAdjust)
+            setTetromino(rotatedMino.newMino)
+          }
+          break
+        }
         case 'ArrowRight':
-          setTetrominoX((e) => (checkCollision(e + 1, tetrominoY) ? e + 1 : e))
+          setTetrominoX((e) => (checkCollision(e + 1, tetrominoY, tetromino) ? e + 1 : e))
           break
         case 'ArrowLeft':
-          setTetrominoX((e) => (checkCollision(e - 1, tetrominoY) ? e - 1 : e))
+          setTetrominoX((e) => (checkCollision(e - 1, tetrominoY, tetromino) ? e - 1 : e))
           break
       }
     },
@@ -138,14 +179,18 @@ const Home: NextPage = () => {
   }, [tetrominoY])
 
   useEffect(() => {
-    console.log(tetrominoY)
-    if (checkCollision(tetrominoX, tetrominoY + 1, true)) {
+    if (checkCollision(tetrominoX, tetrominoY + 1, tetromino, true)) {
       setTetrominoY(tetrominoY + 1)
+      setRestCount(0)
     } else {
+      if (restCount > 1) {
+        console.log('HELP')
+        setRestCount(0)
+        afterFall()
+      }
       setRestCount((e) => e + 1)
     }
     const id = setInterval(() => {
-      console.log(tetrominoX, tetrominoY, 333)
       setEffect(!effect)
     }, 300)
 
