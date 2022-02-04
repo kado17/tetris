@@ -16,22 +16,22 @@ const Board = styled.div`
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-around;
-  width: 80vh;
+  width: 82vh;
   height: 96vh;
   background-color: #ccc;
   border: 0.8vh solid;
   border-color: #ddd #666 #666 #ddd;
 `
 const GameBoard = styled.div`
-  width: 42vh;
-  height: 82vh;
+  width: 50vh;
+  height: 86vh;
   margin-bottom: 2vh;
   background-color: #888;
   border: 1vh solid;
   border-color: #666 #ddd #ddd #666;
 `
 const StateBoard = styled.div`
-  width: 30vh;
+  width: 26vh;
   height: 90vh;
   margin-bottom: 2vh;
   background-color: #aaa;
@@ -43,43 +43,47 @@ const TetrominoSquare = styled.div<{ num: number }>`
   height: 4vh;
   vertical-align: bottom;
   background-color: ${(props) =>
-    1 <= props.num && props.num <= 6 ? COLORS[props.num - 1] : '#111'};
+    1 <= props.num && props.num <= 6 ? COLORS[props.num - 1] : props.num === 9 ? '#777' : '#111'};
   border: 0.05vh solid #999;
 `
 
 const Home: NextPage = () => {
   const startBoard = [
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 0, 0, 0, 0, 0, 0, 3, 3, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 3],
-    [0, 0, 0, 0, 0, 0, 0, 0, 4, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0, 4, 2],
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 4, 2, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 4, 2, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
   ]
   const startTetromino = [
     [0, 1, 0],
     [1, 1, 1],
+    [0, 0, 0],
   ]
 
+  const boardSizeX = startBoard[0].length
+  const boardSizeY = startBoard.length
   const tetrominoList = [[], 0]
 
   const [board, setBoard] = useState(startBoard)
   const [tetromino, setTetromino] = useState(startTetromino)
-  const [tetrominoX, setTetrominoX] = useState(0)
+  const [tetrominoX, setTetrominoX] = useState(1)
   const [tetrominoY, setTetrominoY] = useState(0)
   const [effect, setEffect] = useState(false)
   const [isMovingTetromino, setIsMovingTetromino] = useState(true)
@@ -103,11 +107,11 @@ const Home: NextPage = () => {
 
   const checkCollision = (movedX: number, movedY: number, mino: number[][], isCallByY = false) => {
     if (isCallByY) {
-      if (19 < tetrominoY + mino.length) {
+      if (boardSizeY < tetrominoY + mino.length) {
         return false
       }
     }
-    if (10 < movedX + mino[0].length || movedX < 0) {
+    if (boardSizeX < movedX + mino[0].length || movedX < 0) {
       return false
     }
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
@@ -121,20 +125,12 @@ const Home: NextPage = () => {
     return true
   }
 
-  const rotateRight = (mino: number[][]) => {
-    const newMino = mino[0].map((_, c) => mino.map((r) => r[c]).reverse())
-    const result = {
-      newMino: newMino,
-      heightAdjust: newMino.length > mino.length ? newMino.length - mino.length : 0,
-    }
-    console.log(newMino, result)
-    return result
-  }
+  const rotateRight = (mino: number[][]) => mino[0].map((_, c) => mino.map((r) => r[c]).reverse())
 
   const afterFall = () => {
     setBoard(overlayBoard())
-    setTetromino([[1, 1, 1, 1]])
-    setTetrominoX(0)
+    setTetromino(startTetromino)
+    setTetrominoX(1)
     setTetrominoY(0)
     setIsMovingTetromino(true)
   }
@@ -146,17 +142,9 @@ const Home: NextPage = () => {
           console.log('UP')
           const rotatedMino = rotateRight(tetromino)
           console.log(rotatedMino)
-          if (
-            checkCollision(
-              tetrominoX,
-              tetrominoY - rotatedMino.heightAdjust,
-              rotatedMino.newMino,
-              true
-            )
-          ) {
-            console.log('TRUE', rotatedMino.newMino)
-            //setTetrominoY((e) => e - rotatedMino.heightAdjust)
-            setTetromino(rotatedMino.newMino)
+          if (checkCollision(tetrominoX, tetrominoY, rotatedMino, true)) {
+            console.log('TRUE', rotatedMino)
+            setTetromino(rotatedMino)
           }
           break
         }
