@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-const COLORS = ['aqua', 'yellow', 'purple', 'blue', 'orange', 'green']
+const COLORS = ['aqua', 'yellow', 'purple', 'blue', 'orange', 'green', 'red']
 
 const Container = styled.div`
   display: flex;
@@ -16,22 +16,22 @@ const Board = styled.div`
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-around;
-  width: 82vh;
+  width: 80vh;
   height: 96vh;
   background-color: #ccc;
   border: 0.8vh solid;
   border-color: #ddd #666 #666 #ddd;
 `
 const GameBoard = styled.div`
-  width: 50vh;
-  height: 86vh;
+  width: 42vh;
+  height: 82vh;
   margin-bottom: 2vh;
   background-color: #888;
   border: 1vh solid;
   border-color: #666 #ddd #ddd #666;
 `
 const StateBoard = styled.div`
-  width: 26vh;
+  width: 30vh;
   height: 90vh;
   margin-bottom: 2vh;
   background-color: #aaa;
@@ -43,7 +43,7 @@ const TetrominoSquare = styled.div<{ num: number }>`
   height: 4vh;
   vertical-align: bottom;
   background-color: ${(props) =>
-    1 <= props.num && props.num <= 6 ? COLORS[props.num - 1] : props.num === 9 ? '#777' : '#111'};
+    1 <= props.num && props.num <= 7 ? COLORS[props.num - 1] : props.num === 9 ? '#777' : '#111'};
   border: 0.05vh solid #999;
 `
 
@@ -51,6 +51,7 @@ const Home: NextPage = () => {
   const startBoard = [
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    //ここから下が画面に表示
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -63,26 +64,65 @@ const Home: NextPage = () => {
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 3, 3, 3, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 4, 2, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 4, 2, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    //ここまで
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
-  ]
-  const startTetromino = [
-    [0, 1, 0],
-    [1, 1, 1],
-    [0, 0, 0],
   ]
 
   const boardSizeX = startBoard[0].length
   const boardSizeY = startBoard.length
-  const tetrominoList = [[], 0]
+  const tetrominoList = [
+    [
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+    ],
+    [
+      [2, 2],
+      [2, 2],
+    ],
+    [
+      [0, 3, 0],
+      [3, 3, 3],
+      [0, 0, 0],
+    ],
+    [
+      [4, 0, 0],
+      [4, 4, 4],
+      [0, 0, 0],
+    ],
+    [
+      [0, 0, 5],
+      [5, 5, 5],
+      [0, 0, 0],
+    ],
+    [
+      [0, 0, 5],
+      [5, 5, 5],
+      [0, 0, 0],
+    ],
+    [
+      [0, 6, 6],
+      [6, 6, 0],
+      [0, 0, 0],
+    ],
+    [
+      [7, 7, 0],
+      [0, 7, 7],
+      [0, 0, 0],
+    ],
+  ]
+  const createTetromino = () => tetrominoList[Math.floor(Math.random() * tetrominoList.length)]
 
   const [board, setBoard] = useState(startBoard)
-  const [tetromino, setTetromino] = useState(startTetromino)
+  const [tetromino, setTetromino] = useState(createTetromino())
   const [tetrominoX, setTetrominoX] = useState(1)
   const [tetrominoY, setTetrominoY] = useState(0)
   const [effect, setEffect] = useState(false)
@@ -100,10 +140,6 @@ const Home: NextPage = () => {
     }
     return newBoard
   }
-
-  const viewBoard = useMemo(() => {
-    return overlayBoard()
-  }, [tetrominoX, tetrominoY, tetromino])
 
   const checkCollision = (movedX: number, movedY: number, mino: number[][], isCallByY = false) => {
     if (isCallByY) {
@@ -129,12 +165,18 @@ const Home: NextPage = () => {
 
   const afterFall = () => {
     setBoard(overlayBoard())
-    setTetromino(startTetromino)
+    setTetromino(createTetromino)
     setTetrominoX(1)
     setTetrominoY(0)
     setIsMovingTetromino(true)
   }
-
+  const viewBoard = useMemo(
+    () =>
+      overlayBoard()
+        .slice(2, boardSizeY)
+        .map((r) => r.filter((item) => item !== 9)),
+    [tetrominoX, tetrominoY, tetromino]
+  )
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
       switch (event.key) {
