@@ -30,13 +30,6 @@ const GameBoard = styled.div`
   border: 1vh solid;
   border-color: #666 #ddd #ddd #666;
 `
-const StateBoard = styled.div`
-  width: 30vh;
-  height: 90vh;
-  margin-bottom: 2vh;
-  background-color: #aaa;
-  border: 1vh solid #666;
-`
 const TetrominoSquare = styled.div<{ num: number }>`
   display: inline-block;
   width: 4vh;
@@ -46,7 +39,22 @@ const TetrominoSquare = styled.div<{ num: number }>`
     1 <= props.num && props.num <= 7 ? COLORS[props.num - 1] : props.num === 9 ? '#777' : '#111'};
   border: 0.05vh solid #999;
 `
-
+const StateBoard = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30vh;
+  height: 90vh;
+  margin-bottom: 2vh;
+  background-color: #aaa;
+  border: 1vh solid #666;
+`
+const NextTetrominoView = styled.div`
+  width: 20vh;
+  height: 20vh;
+  background-color: #bbb;
+  border: 1vh solid #666;
+`
 const Home: NextPage = () => {
   const startBoard = [
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -122,7 +130,11 @@ const Home: NextPage = () => {
   const createTetromino = () => tetrominoList[Math.floor(Math.random() * tetrominoList.length)]
 
   const [board, setBoard] = useState(startBoard)
+  const [nextTetrominoBoard, setNextTetrominoBoard] = useState(
+    Array.from(new Array(4), () => new Array(4).fill(0))
+  )
   const [tetromino, setTetromino] = useState(createTetromino())
+  const [nextTetromino, setNextTetromino] = useState(createTetromino())
   const [tetrominoX, setTetrominoX] = useState(1)
   const [tetrominoY, setTetrominoY] = useState(0)
   const [effect, setEffect] = useState(false)
@@ -165,7 +177,8 @@ const Home: NextPage = () => {
 
   const afterFall = () => {
     setBoard(overlayBoard())
-    setTetromino(createTetromino())
+    setTetromino(nextTetromino)
+    setNextTetromino(createTetromino())
     setTetrominoX(1)
     setTetrominoY(0)
   }
@@ -176,6 +189,16 @@ const Home: NextPage = () => {
         .map((r) => r.filter((item) => item !== 9)),
     [tetrominoX, tetrominoY, tetromino]
   )
+  const nextMinoBoard = useCallback(() => {
+    const newBoard: number[][] = Array.from(new Array(4), () => new Array(4).fill(0))
+    for (let y = 0; y < nextTetromino.length; y++) {
+      for (let x = 0; x < nextTetromino[y].length; x++) {
+        newBoard[y][x] = nextTetromino[y][x]
+      }
+    }
+    setNextTetrominoBoard(newBoard)
+  }, [nextTetromino])
+
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (!isMovingTetromino) {
@@ -190,12 +213,12 @@ const Home: NextPage = () => {
           break
         }
         case 'ArrowDown': {
-          console.log('DOWN')
           let tmpY = tetrominoY
           while (checkCollision(tetrominoX, tmpY + 1, tetromino, true)) {
             tmpY++
           }
           setTetrominoY(tmpY)
+          setRestCount(99)
           break
         }
         case 'ArrowRight':
@@ -206,7 +229,7 @@ const Home: NextPage = () => {
           break
       }
     },
-    [tetrominoY, tetromino, isMovingTetromino]
+    [tetrominoX, tetrominoY, tetromino, isMovingTetromino]
   )
 
   useEffect(() => {
@@ -214,7 +237,7 @@ const Home: NextPage = () => {
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
-  }, [tetrominoY, tetromino, isMovingTetromino])
+  }, [tetrominoX, tetrominoY, tetromino, isMovingTetromino])
 
   useEffect(() => {
     if (!isMovingTetromino) {
@@ -222,6 +245,7 @@ const Home: NextPage = () => {
       setIsMovingTetromino(true)
       setEffect(!effect)
     } else {
+      nextMinoBoard()
       if (checkCollision(tetrominoX, tetrominoY + 1, tetromino, true)) {
         setTetrominoY(tetrominoY + 1)
         setRestCount(0)
@@ -247,7 +271,13 @@ const Home: NextPage = () => {
             row.map((num, x) => <TetrominoSquare key={`${x}-${y}`} num={num}></TetrominoSquare>)
           )}
         </GameBoard>
-        <StateBoard></StateBoard>
+        <StateBoard>
+          <NextTetrominoView>
+            {nextTetrominoBoard.map((row, y) =>
+              row.map((num, x) => <TetrominoSquare key={`${x}-${y}`} num={num}></TetrominoSquare>)
+            )}
+          </NextTetrominoView>
+        </StateBoard>
       </Board>
     </Container>
   )
