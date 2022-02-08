@@ -26,7 +26,7 @@ const GameBoard = styled.div`
   width: 42vh;
   height: 82vh;
   margin-bottom: 2vh;
-  background-color: #888;
+  background-color: black;
   border: 1vh solid;
   border-color: #666 #ddd #ddd #666;
 `
@@ -37,7 +37,7 @@ const TetrominoSquare = styled.div<{ num: number }>`
   vertical-align: bottom;
   background-color: ${(props) =>
     1 <= props.num && props.num <= 7 ? COLORS[props.num - 1] : props.num === 9 ? '#777' : '#111'};
-  border: 0.05vh solid #999;
+  border: 0.005vh solid #999;
 `
 const StateBoard = styled.div`
   display: flex;
@@ -50,13 +50,15 @@ const StateBoard = styled.div`
   border: 1vh solid #666;
 `
 const NextTetrominoView = styled.div`
-  width: 20vh;
-  height: 20vh;
-  background-color: #bbb;
-  border: 1vh solid #666;
+  display: inline-block;
+  width: 18vh;
+  height: 18vh;
+  background-color: black;
+  border: 1vh solid black;
 `
 const Home: NextPage = () => {
   const startBoard = [
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     //ここから下が画面に表示
@@ -78,7 +80,7 @@ const Home: NextPage = () => {
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9], //
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     //ここまで
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
@@ -112,19 +114,14 @@ const Home: NextPage = () => {
       [0, 0, 0],
     ],
     [
-      [0, 0, 5],
-      [5, 5, 5],
       [0, 0, 0],
-    ],
-    [
       [0, 6, 6],
       [6, 6, 0],
-      [0, 0, 0],
     ],
     [
+      [0, 0, 0],
       [7, 7, 0],
       [0, 7, 7],
-      [0, 0, 0],
     ],
   ]
   const createTetromino = () => tetrominoList[Math.floor(Math.random() * tetrominoList.length)]
@@ -141,11 +138,11 @@ const Home: NextPage = () => {
   const [isMovingTetromino, setIsMovingTetromino] = useState(true)
   const [restCount, setRestCount] = useState(0)
 
-  const overlayBoard = () => {
+  const overlayBoard = (mino: number[][] = tetromino) => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     for (let y = 0; y < tetromino.length; y++) {
       for (let x = 0; x < tetromino[y].length; x++) {
-        if (tetromino[y][x]) {
+        if (mino[y][x]) {
           newBoard[y + tetrominoY][x + tetrominoX] = tetromino[y][x]
         }
       }
@@ -175,17 +172,10 @@ const Home: NextPage = () => {
 
   const rotateRight = (mino: number[][]) => mino[0].map((_, c) => mino.map((r) => r[c]).reverse())
 
-  const afterFall = () => {
-    setBoard(overlayBoard())
-    setTetromino(nextTetromino)
-    setNextTetromino(createTetromino())
-    setTetrominoX(1)
-    setTetrominoY(0)
-  }
   const viewBoard = useMemo(
     () =>
       overlayBoard()
-        .slice(2, boardSizeY)
+        .slice(3, boardSizeY)
         .map((r) => r.filter((item) => item !== 9)),
     [tetrominoX, tetrominoY, tetromino]
   )
@@ -239,6 +229,20 @@ const Home: NextPage = () => {
     }
   }, [tetrominoX, tetrominoY, tetromino, isMovingTetromino])
 
+  const afterFall = () => {
+    const tmpTetromino = tetromino
+    //while (!checkCollision(tetrominoX, tetrominoY, tmpTetromino, true)) {
+    //tmpTetromino = rotateRight(tmpTetromino)
+    //console.log('RO')
+    //console.log(tmpTetromino)
+    //}
+    setBoard(overlayBoard(tmpTetromino))
+    setTetromino(nextTetromino)
+    setNextTetromino(createTetromino())
+    setTetrominoX(1)
+    setTetrominoY(0)
+  }
+
   useEffect(() => {
     if (!isMovingTetromino) {
       afterFall()
@@ -259,7 +263,7 @@ const Home: NextPage = () => {
       }
       setTimeout(() => {
         setEffect(!effect)
-      }, 500)
+      }, 300)
     }
   }, [effect])
 
