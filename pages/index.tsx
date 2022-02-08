@@ -138,11 +138,11 @@ const Home: NextPage = () => {
   const [isMovingTetromino, setIsMovingTetromino] = useState(true)
   const [restCount, setRestCount] = useState(0)
 
-  const overlayBoard = (mino: number[][] = tetromino) => {
+  const overlayBoard = () => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     for (let y = 0; y < tetromino.length; y++) {
       for (let x = 0; x < tetromino[y].length; x++) {
-        if (mino[y][x]) {
+        if (tetromino[y][x]) {
           newBoard[y + tetrominoY][x + tetrominoX] = tetromino[y][x]
         }
       }
@@ -152,7 +152,7 @@ const Home: NextPage = () => {
 
   const checkCollision = (movedX: number, movedY: number, mino: number[][], isCallByY = false) => {
     if (isCallByY) {
-      if (boardSizeY < tetrominoY + mino.length) {
+      if (boardSizeY < movedY + mino.length) {
         return false
       }
     }
@@ -196,9 +196,14 @@ const Home: NextPage = () => {
       }
       switch (event.key) {
         case 'ArrowUp': {
+          if (restCount > 1) {
+            return
+          }
+          console.log('CALL')
           const rotatedMino = rotateRight(tetromino)
           if (checkCollision(tetrominoX, tetrominoY, rotatedMino, true)) {
             setTetromino(rotatedMino)
+            console.log('ROTATE')
           }
           break
         }
@@ -219,24 +224,22 @@ const Home: NextPage = () => {
           break
       }
     },
-    [tetrominoX, tetrominoY, tetromino, isMovingTetromino]
+    [tetromino, tetrominoX, tetrominoY, isMovingTetromino]
   )
 
   useEffect(() => {
     document.addEventListener('keydown', checkKeyDown, false)
+    if (!checkCollision(tetrominoX, tetrominoY, tetromino)) {
+      console.log('BACK')
+      setTetromino(tetromino[0].map((_, c) => tetromino.map((r) => r[c])).reverse())
+    }
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
-  }, [tetrominoX, tetrominoY, tetromino, isMovingTetromino])
+  }, [tetromino, tetrominoX, tetrominoY, isMovingTetromino])
 
   const afterFall = () => {
-    const tmpTetromino = tetromino
-    //while (!checkCollision(tetrominoX, tetrominoY, tmpTetromino, true)) {
-    //tmpTetromino = rotateRight(tmpTetromino)
-    //console.log('RO')
-    //console.log(tmpTetromino)
-    //}
-    setBoard(overlayBoard(tmpTetromino))
+    setBoard(overlayBoard())
     setTetromino(nextTetromino)
     setNextTetromino(createTetromino())
     setTetrominoX(1)
@@ -252,6 +255,7 @@ const Home: NextPage = () => {
       nextMinoBoard()
       if (checkCollision(tetrominoX, tetrominoY + 1, tetromino, true)) {
         setTetrominoY(tetrominoY + 1)
+        console.log('DOWN')
         setRestCount(0)
       } else {
         if (restCount > 1) {
