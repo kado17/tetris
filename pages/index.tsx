@@ -80,7 +80,7 @@ const Home: NextPage = () => {
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9], //
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     //ここまで
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
@@ -88,43 +88,54 @@ const Home: NextPage = () => {
 
   const boardSizeX = startBoard[0].length
   const boardSizeY = startBoard.length
+  // prettier-ignore
   const tetrominoList = [
     [
-      [0, 0, 0, 0],
-      [1, 1, 1, 1],
-      [0, 0, 0, 0],
+      [[0, 0, 0, 0], [1, 1, 1, 1],],
+      [[0, 1],[0, 1],[0, 1],[0, 1],],
+      [[0, 0, 0, 0], [1, 1, 1, 1],],
+      [[0, 1],[0, 1],[0, 1],[0, 1],],
     ],
     [
-      [2, 2],
-      [2, 2],
+      [[2, 2],[2, 2]],
+      [[2, 2],[2, 2]],
+      [[2, 2],[2, 2]],
+      [[2, 2],[2, 2]],
     ],
     [
-      [0, 3, 0],
-      [3, 3, 3],
-      [0, 0, 0],
+      [[0, 3, 0],[3, 3, 3],[0, 0, 0]],
+      [[0, 3, 0],[0, 3, 3],[0, 3, 0]],
+      [[0, 0, 0],[3, 3, 3],[0, 3, 0]],
+      [[0, 3, 0],[3, 3, 0],[0, 3, 0]],
     ],
     [
-      [4, 0, 0],
-      [4, 4, 4],
-      [0, 0, 0],
+      [[4, 0, 0],[4, 4, 4],[0, 0, 0]],
+      [[0, 4, 4],[0, 4, 0],[0, 4, 0]],
+      [[0, 0, 0],[4, 4, 4],[0, 0, 4]],
+      [[0, 0, 4],[0, 0, 4],[0, 4, 4]],
     ],
     [
-      [0, 0, 5],
-      [5, 5, 5],
-      [0, 0, 0],
+      [[0, 0, 5],[5, 5, 5],[0, 0, 0]],
+      [[0, 5, 0],[0, 5, 0],[0, 5, 5]],
+      [[0, 0, 0],[5, 5, 5],[5, 0, 0]],
+      [[5, 5, 0],[0, 5, 0],[0, 5, 0]],
     ],
     [
-      [0, 0, 0],
-      [0, 6, 6],
-      [6, 6, 0],
+      [[0, 6, 6],[6, 6, 0],[0, 0, 0]],
+      [[6, 0, 0],[6, 6, 0],[0, 6, 0]],
+      [[0, 6, 6],[6, 6, 0],[0, 0, 0]],
+      [[6, 0, 0],[6, 6, 0],[0, 6, 0]],
     ],
     [
-      [0, 0, 0],
-      [7, 7, 0],
-      [0, 7, 7],
+      [[7, 7, 0],[0, 7, 7],[0, 0, 0]],
+      [[0, 7, 0],[7, 7, 0],[7, 0, 0]],
+      [[7, 7, 0],[0, 7, 7],[0, 0, 0]],
+      [[0, 7, 0],[7, 7, 0],[7, 0, 0]],
     ],
   ]
-  const createTetromino = () => tetrominoList[Math.floor(Math.random() * tetrominoList.length)]
+  const createTetromino = () => {
+    return { mino: tetrominoList[Math.floor(Math.random() * tetrominoList.length)], angle: 0 }
+  }
 
   const [board, setBoard] = useState(startBoard)
   const [nextTetrominoBoard, setNextTetrominoBoard] = useState(
@@ -140,10 +151,10 @@ const Home: NextPage = () => {
 
   const overlayBoard = () => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    for (let y = 0; y < tetromino.length; y++) {
-      for (let x = 0; x < tetromino[y].length; x++) {
-        if (tetromino[y][x]) {
-          newBoard[y + tetrominoY][x + tetrominoX] = tetromino[y][x]
+    for (let y = 0; y < tetromino.mino[tetromino.angle].length; y++) {
+      for (let x = 0; x < tetromino.mino[tetromino.angle][y].length; x++) {
+        if (tetromino.mino[tetromino.angle][y][x]) {
+          newBoard[y + tetrominoY][x + tetrominoX] = tetromino.mino[tetromino.angle][y][x]
         }
       }
     }
@@ -169,9 +180,6 @@ const Home: NextPage = () => {
     }
     return true
   }
-
-  const rotateRight = (mino: number[][]) => mino[0].map((_, c) => mino.map((r) => r[c]).reverse())
-
   const viewBoard = useMemo(
     () =>
       overlayBoard()
@@ -181,13 +189,16 @@ const Home: NextPage = () => {
   )
   const nextMinoBoard = useCallback(() => {
     const newBoard: number[][] = Array.from(new Array(4), () => new Array(4).fill(0))
-    for (let y = 0; y < nextTetromino.length; y++) {
-      for (let x = 0; x < nextTetromino[y].length; x++) {
-        newBoard[y][x] = nextTetromino[y][x]
+    for (let y = 0; y < nextTetromino.mino[tetromino.angle].length; y++) {
+      for (let x = 0; x < nextTetromino.mino[tetromino.angle][y].length; x++) {
+        newBoard[y][x] = nextTetromino.mino[tetromino.angle][y][x]
       }
     }
     setNextTetrominoBoard(newBoard)
   }, [nextTetromino])
+
+  const rotateAngleRight = (angle: number) => (angle < 3 ? angle + 1 : 0)
+  const rotateAngleLeft = (angle: number) => (0 < angle ? angle - 1 : 3)
 
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -200,16 +211,16 @@ const Home: NextPage = () => {
             return
           }
           console.log('CALL')
-          const rotatedMino = rotateRight(tetromino)
-          if (checkCollision(tetrominoX, tetrominoY, rotatedMino, true)) {
-            setTetromino(rotatedMino)
+          const rotatedAngle = rotateAngleRight(tetromino.angle)
+          if (checkCollision(tetrominoX, tetrominoY, tetromino.mino[rotatedAngle], true)) {
+            setTetromino({ ...tetromino, angle: rotatedAngle })
             console.log('ROTATE')
           }
           break
         }
         case 'ArrowDown': {
           let tmpY = tetrominoY
-          while (checkCollision(tetrominoX, tmpY + 1, tetromino, true)) {
+          while (checkCollision(tetrominoX, tmpY + 1, tetromino.mino[tetromino.angle], true)) {
             tmpY++
           }
           setTetrominoY(tmpY)
@@ -217,10 +228,14 @@ const Home: NextPage = () => {
           break
         }
         case 'ArrowRight':
-          setTetrominoX((e) => (checkCollision(e + 1, tetrominoY, tetromino) ? e + 1 : e))
+          setTetrominoX((e) =>
+            checkCollision(e + 1, tetrominoY, tetromino.mino[tetromino.angle]) ? e + 1 : e
+          )
           break
         case 'ArrowLeft':
-          setTetrominoX((e) => (checkCollision(e - 1, tetrominoY, tetromino) ? e - 1 : e))
+          setTetrominoX((e) =>
+            checkCollision(e - 1, tetrominoY, tetromino.mino[tetromino.angle]) ? e - 1 : e
+          )
           break
       }
     },
@@ -229,9 +244,9 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     document.addEventListener('keydown', checkKeyDown, false)
-    if (!checkCollision(tetrominoX, tetrominoY, tetromino)) {
+    if (!checkCollision(tetrominoX, tetrominoY, tetromino.mino[tetromino.angle])) {
       console.log('BACK')
-      setTetromino(tetromino[0].map((_, c) => tetromino.map((r) => r[c])).reverse())
+      setTetromino({ ...tetromino, angle: rotateAngleLeft(tetromino.angle) })
     }
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
@@ -253,7 +268,7 @@ const Home: NextPage = () => {
       setEffect(!effect)
     } else {
       nextMinoBoard()
-      if (checkCollision(tetrominoX, tetrominoY + 1, tetromino, true)) {
+      if (checkCollision(tetrominoX, tetrominoY + 1, tetromino.mino[tetromino.angle], true)) {
         setTetrominoY(tetrominoY + 1)
         console.log('DOWN')
         setRestCount(0)
