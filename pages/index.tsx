@@ -148,6 +148,7 @@ const Home: NextPage = () => {
   const [effect, setEffect] = useState(false)
   const [isMovingTetromino, setIsMovingTetromino] = useState(true)
   const [restCount, setRestCount] = useState(0)
+  const [lineCount, setLineCount] = useState(0)
 
   const overlayBoard = () => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
@@ -210,11 +211,9 @@ const Home: NextPage = () => {
           if (restCount > 1) {
             return
           }
-          console.log('CALL')
           const rotatedAngle = rotateAngleRight(tetromino.angle)
           if (checkCollision(tetrominoX, tetrominoY, tetromino.mino[rotatedAngle], true)) {
             setTetromino({ ...tetromino, angle: rotatedAngle })
-            console.log('ROTATE')
           }
           break
         }
@@ -245,7 +244,6 @@ const Home: NextPage = () => {
   useEffect(() => {
     document.addEventListener('keydown', checkKeyDown, false)
     if (!checkCollision(tetrominoX, tetrominoY, tetromino.mino[tetromino.angle])) {
-      console.log('BACK')
       setTetromino({ ...tetromino, angle: rotateAngleLeft(tetromino.angle) })
     }
     return () => {
@@ -254,7 +252,17 @@ const Home: NextPage = () => {
   }, [tetromino, tetrominoX, tetrominoY, isMovingTetromino])
 
   const afterFall = () => {
-    setBoard(overlayBoard())
+    const ovelBoard = overlayBoard()
+    const newBoard: number[][] = []
+    for (let row = 0; row < ovelBoard.length; row++) {
+      if (ovelBoard[row].every((r) => r > 0) && !ovelBoard[row].every((r) => r === 9)) {
+        setLineCount((e) => e + 1)
+        newBoard.unshift([9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9])
+      } else {
+        newBoard.push(ovelBoard[row])
+      }
+    }
+    setBoard(newBoard)
     setTetromino(nextTetromino)
     setNextTetromino(createTetromino())
     setTetrominoX(1)
@@ -270,7 +278,6 @@ const Home: NextPage = () => {
       nextMinoBoard()
       if (checkCollision(tetrominoX, tetrominoY + 1, tetromino.mino[tetromino.angle], true)) {
         setTetrominoY(tetrominoY + 1)
-        console.log('DOWN')
         setRestCount(0)
       } else {
         if (restCount > 1) {
