@@ -60,7 +60,8 @@ const Home: NextPage = () => {
   const startBoard = [
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, /**/ 0, 0, 0, 0, /**/ 0, 0, 0, 9],
+    [9, 0, 0, 0, /**/ 0, 0, 0, 0, /**/ 0, 0, 0, 9],
     //ここから下が画面に表示
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -85,9 +86,9 @@ const Home: NextPage = () => {
     //ここまで
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
   ]
-
   const boardSizeX = startBoard[0].length
   const boardSizeY = startBoard.length
+  const startNextTetrominoBoard = Array.from(new Array(4), () => new Array(4).fill(0))
   // prettier-ignore
   const tetrominoList = [
     [
@@ -97,10 +98,10 @@ const Home: NextPage = () => {
       [[0, 1],[0, 1],[0, 1],[0, 1],],
     ],
     [
-      [[2, 2],[2, 2]],
-      [[2, 2],[2, 2]],
-      [[2, 2],[2, 2]],
-      [[2, 2],[2, 2]],
+      [[0, 2, 2],[0, 2, 2]],
+      [[0, 2, 2],[0, 2, 2]],
+      [[0, 2, 2],[0, 2, 2]],
+      [[0, 2, 2],[0, 2, 2]],
     ],
     [
       [[0, 3, 0],[3, 3, 3],[0, 0, 0]],
@@ -133,34 +134,52 @@ const Home: NextPage = () => {
       [[0, 7, 0],[7, 7, 0],[7, 0, 0]],
     ],
   ]
+  const startTetrominoX = 4
+  const startTetrominoY = 1
+
   const createTetromino = () => {
-    return { mino: tetrominoList[Math.floor(Math.random() * tetrominoList.length)], angle: 0 }
+    return { block: tetrominoList[Math.floor(Math.random() * tetrominoList.length)], angle: 0 }
   }
 
   const [board, setBoard] = useState(startBoard)
-  const [nextTetrominoBoard, setNextTetrominoBoard] = useState(
-    Array.from(new Array(4), () => new Array(4).fill(0))
-  )
+  const [nextTetrominoBoard, setNextTetrominoBoard] = useState(startNextTetrominoBoard)
   const [tetromino, setTetromino] = useState(createTetromino())
   const [nextTetromino, setNextTetromino] = useState(createTetromino())
-  const [tetrominoX, setTetrominoX] = useState(1)
-  const [tetrominoY, setTetrominoY] = useState(0)
+  const [tetrominoX, setTetrominoX] = useState(startTetrominoX)
+  const [tetrominoY, setTetrominoY] = useState(startTetrominoY)
   const [effect, setEffect] = useState(false)
-  const [isMovingTetromino, setIsMovingTetromino] = useState(true)
   const [restCount, setRestCount] = useState(0)
+  const [isOverlayProcessing, setIsOverlayProcessing] = useState(true)
+  const [isGameover, setIsGameover] = useState(false)
   const [lineCount, setLineCount] = useState(0)
 
   const overlayBoard = () => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    for (let y = 0; y < tetromino.mino[tetromino.angle].length; y++) {
-      for (let x = 0; x < tetromino.mino[tetromino.angle][y].length; x++) {
-        if (tetromino.mino[tetromino.angle][y][x]) {
-          newBoard[y + tetrominoY][x + tetrominoX] = tetromino.mino[tetromino.angle][y][x]
+    for (let y = 0; y < tetromino.block[tetromino.angle].length; y++) {
+      for (let x = 0; x < tetromino.block[tetromino.angle][y].length; x++) {
+        if (tetromino.block[tetromino.angle][y][x]) {
+          newBoard[y + tetrominoY][x + tetrominoX] = tetromino.block[tetromino.angle][y][x]
         }
       }
     }
     return newBoard
   }
+  const viewBoard = useMemo(
+    () =>
+      overlayBoard()
+        .slice(4, boardSizeY)
+        .map((r) => r.filter((item) => item !== 9)),
+    [tetrominoX, tetrominoY, tetromino]
+  )
+  const nextMinoBoard = useCallback(() => {
+    const newBoard: number[][] = startNextTetrominoBoard
+    for (let y = 0; y < nextTetromino.block[tetromino.angle].length; y++) {
+      for (let x = 0; x < nextTetromino.block[tetromino.angle][y].length; x++) {
+        newBoard[y][x] = nextTetromino.block[tetromino.angle][y][x]
+      }
+    }
+    setNextTetrominoBoard(newBoard)
+  }, [nextTetromino])
 
   const checkCollision = (movedX: number, movedY: number, mino: number[][], isCallByY = false) => {
     if (isCallByY) {
@@ -181,45 +200,26 @@ const Home: NextPage = () => {
     }
     return true
   }
-  const viewBoard = useMemo(
-    () =>
-      overlayBoard()
-        .slice(3, boardSizeY)
-        .map((r) => r.filter((item) => item !== 9)),
-    [tetrominoX, tetrominoY, tetromino]
-  )
-  const nextMinoBoard = useCallback(() => {
-    const newBoard: number[][] = Array.from(new Array(4), () => new Array(4).fill(0))
-    for (let y = 0; y < nextTetromino.mino[tetromino.angle].length; y++) {
-      for (let x = 0; x < nextTetromino.mino[tetromino.angle][y].length; x++) {
-        newBoard[y][x] = nextTetromino.mino[tetromino.angle][y][x]
-      }
-    }
-    setNextTetrominoBoard(newBoard)
-  }, [nextTetromino])
 
   const rotateAngleRight = (angle: number) => (angle < 3 ? angle + 1 : 0)
   const rotateAngleLeft = (angle: number) => (0 < angle ? angle - 1 : 3)
 
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
-      if (!isMovingTetromino) {
-        return
-      }
       switch (event.key) {
         case 'ArrowUp': {
           if (restCount > 1) {
             return
           }
           const rotatedAngle = rotateAngleRight(tetromino.angle)
-          if (checkCollision(tetrominoX, tetrominoY, tetromino.mino[rotatedAngle], true)) {
+          if (checkCollision(tetrominoX, tetrominoY, tetromino.block[rotatedAngle], true)) {
             setTetromino({ ...tetromino, angle: rotatedAngle })
           }
           break
         }
         case 'ArrowDown': {
           let tmpY = tetrominoY
-          while (checkCollision(tetrominoX, tmpY + 1, tetromino.mino[tetromino.angle], true)) {
+          while (checkCollision(tetrominoX, tmpY + 1, tetromino.block[tetromino.angle], true)) {
             tmpY++
           }
           setTetrominoY(tmpY)
@@ -228,28 +228,31 @@ const Home: NextPage = () => {
         }
         case 'ArrowRight':
           setTetrominoX((e) =>
-            checkCollision(e + 1, tetrominoY, tetromino.mino[tetromino.angle]) ? e + 1 : e
+            checkCollision(e + 1, tetrominoY, tetromino.block[tetromino.angle]) ? e + 1 : e
           )
           break
         case 'ArrowLeft':
           setTetrominoX((e) =>
-            checkCollision(e - 1, tetrominoY, tetromino.mino[tetromino.angle]) ? e - 1 : e
+            checkCollision(e - 1, tetrominoY, tetromino.block[tetromino.angle]) ? e - 1 : e
           )
           break
       }
     },
-    [tetromino, tetrominoX, tetrominoY, isMovingTetromino]
+    [tetromino, tetrominoX, tetrominoY]
   )
 
   useEffect(() => {
+    if (!isOverlayProcessing || isGameover) {
+      return
+    }
     document.addEventListener('keydown', checkKeyDown, false)
-    if (!checkCollision(tetrominoX, tetrominoY, tetromino.mino[tetromino.angle])) {
+    if (!checkCollision(tetrominoX, tetrominoY, tetromino.block[tetromino.angle])) {
       setTetromino({ ...tetromino, angle: rotateAngleLeft(tetromino.angle) })
     }
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
-  }, [tetromino, tetrominoX, tetrominoY, isMovingTetromino])
+  }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameover])
 
   const afterFall = () => {
     const ovelBoard = overlayBoard()
@@ -262,27 +265,38 @@ const Home: NextPage = () => {
         newBoard.push(ovelBoard[row])
       }
     }
+    if (
+      !checkCollision(startTetrominoX, startTetrominoY, nextTetromino.block[0]) ||
+      tetrominoY < 3
+    ) {
+      setIsGameover(true)
+    }
     setBoard(newBoard)
     setTetromino(nextTetromino)
+    setTetrominoX(startTetrominoX)
+    setTetrominoY(startTetrominoY)
     setNextTetromino(createTetromino())
-    setTetrominoX(1)
-    setTetrominoY(0)
   }
 
   useEffect(() => {
-    if (!isMovingTetromino) {
+    if (isGameover) {
+      console.log('GAMEOVER')
+      console.log(board)
+      return
+    }
+    if (!isOverlayProcessing) {
       afterFall()
-      setIsMovingTetromino(true)
+      setIsOverlayProcessing(true)
       setEffect(!effect)
     } else {
       nextMinoBoard()
-      if (checkCollision(tetrominoX, tetrominoY + 1, tetromino.mino[tetromino.angle], true)) {
+      if (checkCollision(tetrominoX, tetrominoY + 1, tetromino.block[tetromino.angle], true)) {
         setTetrominoY(tetrominoY + 1)
         setRestCount(0)
       } else {
         if (restCount > 1) {
           setRestCount(0)
-          setIsMovingTetromino(false)
+          setIsOverlayProcessing(false)
         } else {
           setRestCount((e) => e + 1)
         }
