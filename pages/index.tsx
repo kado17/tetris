@@ -16,8 +16,8 @@ const Board = styled.div`
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-around;
-  width: 80vh;
-  height: 96vh;
+  width: 74vh;
+  height: 88vh;
   background-color: #ccc;
   border: 0.8vh solid;
   border-color: #ddd #666 #666 #ddd;
@@ -30,38 +30,51 @@ const GameBoard = styled.div`
   border: 1vh solid;
   border-color: #666 #ddd #ddd #666;
 `
-const TetrominoSquare = styled.div<{ num: number }>`
+const TetrominoBlock = styled.div<{ num: number }>`
   display: inline-block;
   width: 4vh;
   height: 4vh;
   vertical-align: bottom;
   background-color: ${(props) =>
-    1 <= props.num && props.num <= 7 ? COLORS[props.num - 1] : props.num === 9 ? '#777' : '#111'};
-  border: 0.005vh solid #999;
+    1 <= props.num && props.num <= 7 ? COLORS[props.num - 1] : '#111'};
+  ${(props) =>
+    1 <= props.num && props.num <= 7
+      ? 'border: 0.3vh solid; border-color: #ddd #666 #666 #ddd;'
+      : ''};
 `
 const StateBoard = styled.div`
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  width: 30vh;
-  height: 90vh;
+  width: 24vh;
+  height: 82vh;
   margin-bottom: 2vh;
-  background-color: #aaa;
-  border: 1vh solid #666;
+  background-color: #bbb;
+  border: 0.5vh solid #666;
+`
+const TextArea = styled.div`
+  display: flex;
+  width: 20vh;
+  margin-top: 2vh;
+  font-size: 3vh;
+`
+const GameoverTextArea = styled(TextArea)`
+  justify-content: center;
+  font-size: 3.5vh;
 `
 const NextTetrominoView = styled.div`
   display: inline-block;
-  width: 18vh;
-  height: 18vh;
+  width: 20vh;
+  height: 20vh;
   background-color: black;
-  border: 1vh solid black;
+  border: 2vh solid black;
 `
 const Home: NextPage = () => {
   const startBoard = [
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, /**/ 0, 0, 0, 0, /**/ 0, 0, 0, 9],
-    [9, 0, 0, 0, /**/ 0, 0, 0, 0, /**/ 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     //ここから下が画面に表示
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -312,15 +325,18 @@ const Home: NextPage = () => {
       <Board>
         <GameBoard>
           {viewBoard.map((row, y) =>
-            row.map((num, x) => <TetrominoSquare key={`${x}-${y}`} num={num}></TetrominoSquare>)
+            row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
           )}
         </GameBoard>
         <StateBoard>
+          <TextArea>Next:</TextArea>
           <NextTetrominoView>
             {nextTetrominoBoard.map((row, y) =>
-              row.map((num, x) => <TetrominoSquare key={`${x}-${y}`} num={num}></TetrominoSquare>)
+              row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
             )}
           </NextTetrominoView>
+          <TextArea>Lines: {lineCount}</TextArea>
+          <GameoverTextArea>{isGameover ? 'GAME OVER' : ''}</GameoverTextArea>
         </StateBoard>
       </Board>
     </Container>
