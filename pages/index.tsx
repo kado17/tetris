@@ -1,4 +1,5 @@
 import type { NextPage } from 'next'
+import Head from 'next/head'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
@@ -60,7 +61,8 @@ const TextArea = styled.div`
 `
 const GameoverTextArea = styled(TextArea)`
   justify-content: center;
-  font-size: 3.5vh;
+  font-size: 3.4vh;
+  font-weight: bold;
 `
 const NextTetrominoView = styled.div`
   display: inline-block;
@@ -168,10 +170,11 @@ const Home: NextPage = () => {
 
   const overlayBoard = () => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    for (let y = 0; y < tetromino.block[tetromino.angle].length; y++) {
-      for (let x = 0; x < tetromino.block[tetromino.angle][y].length; x++) {
-        if (tetromino.block[tetromino.angle][y][x]) {
-          newBoard[y + tetrominoY][x + tetrominoX] = tetromino.block[tetromino.angle][y][x]
+    const tb = tetromino.block[tetromino.angle]
+    for (let y = 0; y < tb.length; y++) {
+      for (let x = 0; x < tb[y].length; x++) {
+        if (tb[y][x]) {
+          newBoard[y + tetrominoY][x + tetrominoX] = tb[y][x]
         }
       }
     }
@@ -186,9 +189,10 @@ const Home: NextPage = () => {
   )
   const nextMinoBoard = useCallback(() => {
     const newBoard: number[][] = startNextTetrominoBoard
-    for (let y = 0; y < nextTetromino.block[tetromino.angle].length; y++) {
-      for (let x = 0; x < nextTetromino.block[tetromino.angle][y].length; x++) {
-        newBoard[y][x] = nextTetromino.block[tetromino.angle][y][x]
+    const ntb = nextTetromino.block[nextTetromino.angle]
+    for (let y = 0; y < ntb.length; y++) {
+      for (let x = 0; x < ntb[y].length; x++) {
+        newBoard[y][x] = ntb[y][x]
       }
     }
     setNextTetrominoBoard(newBoard)
@@ -293,8 +297,6 @@ const Home: NextPage = () => {
 
   useEffect(() => {
     if (isGameover) {
-      console.log('GAMEOVER')
-      console.log(board)
       return
     }
     if (!isOverlayProcessing) {
@@ -321,25 +323,30 @@ const Home: NextPage = () => {
   }, [effect])
 
   return (
-    <Container>
-      <Board>
-        <GameBoard>
-          {viewBoard.map((row, y) =>
-            row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
-          )}
-        </GameBoard>
-        <StateBoard>
-          <TextArea>Next:</TextArea>
-          <NextTetrominoView>
-            {nextTetrominoBoard.map((row, y) =>
+    <>
+      <Head>
+        <title>Pseudo-Tetris </title>
+      </Head>
+      <Container>
+        <Board>
+          <GameBoard>
+            {viewBoard.map((row, y) =>
               row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
             )}
-          </NextTetrominoView>
-          <TextArea>Lines: {lineCount}</TextArea>
-          <GameoverTextArea>{isGameover ? 'GAME OVER' : ''}</GameoverTextArea>
-        </StateBoard>
-      </Board>
-    </Container>
+          </GameBoard>
+          <StateBoard>
+            <TextArea>Next:</TextArea>
+            <NextTetrominoView>
+              {nextTetrominoBoard.map((row, y) =>
+                row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
+              )}
+            </NextTetrominoView>
+            <TextArea>Points: {lineCount}</TextArea>
+            <GameoverTextArea>{isGameover ? 'GAME OVER' : ''}</GameoverTextArea>
+          </StateBoard>
+        </Board>
+      </Container>
+    </>
   )
 }
 
