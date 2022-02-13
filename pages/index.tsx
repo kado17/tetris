@@ -67,21 +67,27 @@ const TetrominoBlock = styled.div<{ num: number }>`
         : ''};
   }
 `
-const StateBoard = styled.div`
+const SideArea = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   margin-bottom: 2vh;
   font-size: 0;
-  background-color: #bbb;
+`
+const StateBoard = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 0;
+  background-color: #aaa;
   border: 0.5vh solid #666;
   @media screen and (max-width: 650px) {
-    width: 12vh;
-    height: 42vh;
+    width: 13vh;
+    height: 28vh;
   }
   @media screen and (min-width: 651px) {
-    width: 24vh;
-    height: 82vh;
+    width: 25vh;
+    height: 57.5vh;
   }
 `
 const TextArea = styled.div`
@@ -122,6 +128,65 @@ const NextTetrominoView = styled.div`
     border: 2vh solid black;
   }
 `
+const StartButton = styled.div<{ isGameStart: boolean }>`
+  margin: 1vh 0;
+  color: #111;
+  text-align: center;
+  ${(props) => (props.isGameStart ? '' : ' background-color: #888;')}
+  @media screen and (max-width: 650px) {
+    width: 12.6vh;
+    height: 3vh;
+    font-size: 1.5vh;
+    line-height: 2vh;
+    ${(props) =>
+      props.isGameStart ? '' : 'border: 0.5vh solid;border-color: #bbb #666 #666 #bbb;'}
+  }
+  @media screen and (min-width: 651px) {
+    width: 24vh;
+    height: 5.5vh;
+    font-size: 3vh;
+    line-height: 4vh;
+    ${(props) =>
+      props.isGameStart ? '' : 'border: 0.8vh solid;border-color: #bbb #666 #666 #bbb;'}
+  }
+`
+const Controller = styled.div`
+  vertical-align: bottom;
+  background-color: #aaa;
+  @media screen and (max-width: 650px) {
+    width: 13vh;
+    height: 9vh;
+    border: 0.5vh solid #666;
+  }
+  @media screen and (min-width: 651px) {
+    width: 25vh;
+    height: 17vh;
+    border: 0.5vh solid #666;
+  }
+`
+const ControllerButton = styled.div<{ c: string }>`
+  display: inline-block;
+  color: black;
+  text-align: center;
+  vertical-align: top;
+  ${(props) => (props.c === '' ? '' : 'background-color: #888;')}
+
+  @media screen and (max-width: 650px) {
+    width: 4vh;
+    height: 4vh;
+    font-size: 3vh;
+    line-height: 2.5vh;
+    ${(props) => (props.c === '' ? '' : 'border: 0.6vh solid; border-color: #bbb #666 #666 #bbb;')}
+  }
+  @media screen and (min-width: 651px) {
+    width: 8vh;
+    height: 8vh;
+    font-size: 6.5vh;
+    line-height: 5vh;
+    ${(props) => (props.c === '' ? '' : 'border: 1vh solid; border-color: #bbb #666 #666 #bbb;')}
+  }
+`
+
 const Home: NextPage = () => {
   const startBoard = [
     [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -216,6 +281,7 @@ const Home: NextPage = () => {
   const [effect, setEffect] = useState(false)
   const [restCount, setRestCount] = useState(0)
   const [isOverlayProcessing, setIsOverlayProcessing] = useState(true)
+  const [isGameStart, setIsGameStart] = useState(false)
   const [isGameover, setIsGameover] = useState(false)
   const [lineCount, setLineCount] = useState(0)
 
@@ -272,37 +338,48 @@ const Home: NextPage = () => {
   const rotateAngleRight = (angle: number) => (angle < 3 ? angle + 1 : 0)
   const rotateAngleLeft = (angle: number) => (0 < angle ? angle - 1 : 3)
 
+  const rotate = () => {
+    if (restCount > 1) {
+      return
+    }
+    const rotatedAngle = rotateAngleRight(tetromino.angle)
+    if (checkCollision(tetrominoX, tetrominoY, tetromino.block[rotatedAngle], true)) {
+      setTetromino({ ...tetromino, angle: rotatedAngle })
+    }
+  }
+  const fall = () => {
+    let tmpY = tetrominoY
+    while (checkCollision(tetrominoX, tmpY + 1, tetromino.block[tetromino.angle], true)) {
+      tmpY++
+    }
+    setTetrominoY(tmpY)
+    setRestCount(99)
+  }
+  const moveRight = () => {
+    setTetrominoX((e) =>
+      checkCollision(e + 1, tetrominoY, tetromino.block[tetromino.angle]) ? e + 1 : e
+    )
+  }
+  const moveLeft = () => {
+    setTetrominoX((e) =>
+      checkCollision(e - 1, tetrominoY, tetromino.block[tetromino.angle]) ? e - 1 : e
+    )
+  }
+
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
       switch (event.key) {
-        case 'ArrowUp': {
-          if (restCount > 1) {
-            return
-          }
-          const rotatedAngle = rotateAngleRight(tetromino.angle)
-          if (checkCollision(tetrominoX, tetrominoY, tetromino.block[rotatedAngle], true)) {
-            setTetromino({ ...tetromino, angle: rotatedAngle })
-          }
+        case 'ArrowUp':
+          rotate()
           break
-        }
-        case 'ArrowDown': {
-          let tmpY = tetrominoY
-          while (checkCollision(tetrominoX, tmpY + 1, tetromino.block[tetromino.angle], true)) {
-            tmpY++
-          }
-          setTetrominoY(tmpY)
-          setRestCount(99)
+        case 'ArrowDown':
+          fall()
           break
-        }
         case 'ArrowRight':
-          setTetrominoX((e) =>
-            checkCollision(e + 1, tetrominoY, tetromino.block[tetromino.angle]) ? e + 1 : e
-          )
+          moveRight()
           break
         case 'ArrowLeft':
-          setTetrominoX((e) =>
-            checkCollision(e - 1, tetrominoY, tetromino.block[tetromino.angle]) ? e - 1 : e
-          )
+          moveLeft()
           break
       }
     },
@@ -310,7 +387,7 @@ const Home: NextPage = () => {
   )
 
   useEffect(() => {
-    if (!isOverlayProcessing || isGameover) {
+    if (!isOverlayProcessing || !isGameStart || isGameover) {
       return
     }
     document.addEventListener('keydown', checkKeyDown, false)
@@ -320,7 +397,24 @@ const Home: NextPage = () => {
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
-  }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameover])
+  }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameStart, isGameover])
+
+  const onClickCbtn = (x: number, y: number) => {
+    switch ([y, x].toString()) {
+      case [0, 1].toString():
+        rotate()
+        break
+      case [1, 1].toString():
+        fall()
+        break
+      case [1, 2].toString():
+        moveRight()
+        break
+      case [1, 0].toString():
+        moveLeft()
+        break
+    }
+  }
 
   const afterFall = () => {
     const ovelBoard = overlayBoard()
@@ -347,7 +441,7 @@ const Home: NextPage = () => {
   }
 
   useEffect(() => {
-    if (isGameover) {
+    if (!isGameStart || isGameover) {
       return
     }
     if (!isOverlayProcessing) {
@@ -369,9 +463,13 @@ const Home: NextPage = () => {
       }
       setTimeout(() => {
         setEffect(!effect)
-      }, 300)
+      }, 400)
     }
-  }, [effect])
+  }, [effect, isGameStart])
+
+  const gameStart = () => {
+    setIsGameStart(true)
+  }
 
   return (
     <>
@@ -385,16 +483,34 @@ const Home: NextPage = () => {
               row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
             )}
           </GameBoard>
-          <StateBoard>
-            <TextArea>Next:</TextArea>
-            <NextTetrominoView>
-              {nextTetrominoBoard.map((row, y) =>
-                row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
+          <SideArea>
+            <StateBoard>
+              <TextArea>Next:</TextArea>
+              <NextTetrominoView>
+                {nextTetrominoBoard.map((row, y) =>
+                  row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
+                )}
+              </NextTetrominoView>
+              <TextArea>Score: {lineCount}</TextArea>
+              <GameoverTextArea>{isGameover ? 'GAME OVER' : ''}</GameoverTextArea>
+            </StateBoard>
+
+            <StartButton isGameStart={isGameStart} onClick={() => gameStart()}>
+              {isGameStart ? '' : 'Game Start'}
+            </StartButton>
+            <Controller>
+              {[
+                ['', '⤵', ''],
+                ['←', '↓', '→'],
+              ].map((row, y) =>
+                row.map((c, x) => (
+                  <ControllerButton key={`${x}-${y}`} onClick={() => onClickCbtn(x, y)} c={c}>
+                    {c}
+                  </ControllerButton>
+                ))
               )}
-            </NextTetrominoView>
-            <TextArea>Score: {lineCount}</TextArea>
-            <GameoverTextArea>{isGameover ? 'GAME OVER' : ''}</GameoverTextArea>
-          </StateBoard>
+            </Controller>
+          </SideArea>
         </Board>
       </Container>
     </>
