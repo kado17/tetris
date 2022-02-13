@@ -174,7 +174,7 @@ const ControllerButton = styled.div<{ c: string }>`
   @media screen and (max-width: 650px) {
     width: 4vh;
     height: 4vh;
-    font-size: 3vh;
+    font-size: 2.7vh;
     line-height: 2.5vh;
     ${(props) => (props.c === '' ? '' : 'border: 0.6vh solid; border-color: #bbb #666 #666 #bbb;')}
   }
