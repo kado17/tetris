@@ -17,59 +17,110 @@ const Board = styled.div`
   flex-direction: row;
   align-items: flex-end;
   justify-content: space-around;
-  width: 74vh;
-  height: 88vh;
   background-color: #ccc;
   border: 0.8vh solid;
   border-color: #ddd #666 #666 #ddd;
+  @media screen and (max-width: 650px) {
+    width: 40vh;
+    height: 48vh;
+  }
+  @media screen and (min-width: 651px) {
+    width: 74vh;
+    height: 88vh;
+  }
 `
 const GameBoard = styled.div`
-  width: 42vh;
-  height: 82vh;
   margin-bottom: 2vh;
+  font-size: 0;
   background-color: black;
   border: 1vh solid;
   border-color: #666 #ddd #ddd #666;
+  @media screen and (max-width: 650px) {
+    width: 22vh;
+    height: 42vh;
+  }
+  @media screen and (min-width: 651px) {
+    width: 42vh;
+    height: 82vh;
+  }
 `
 const TetrominoBlock = styled.div<{ num: number }>`
   display: inline-block;
-  width: 4vh;
-  height: 4vh;
   vertical-align: bottom;
   background-color: ${(props) =>
     1 <= props.num && props.num <= 7 ? COLORS[props.num - 1] : '#111'};
-  ${(props) =>
-    1 <= props.num && props.num <= 7
-      ? 'border: 0.3vh solid; border-color: #ddd #666 #666 #ddd;'
-      : ''};
+
+  @media screen and (max-width: 650px) {
+    width: 2vh;
+    height: 2vh;
+    ${(props) =>
+      1 <= props.num && props.num <= 7
+        ? 'border: 0.2vh solid; border-color: #ddd #666 #666 #ddd;'
+        : ''};
+  }
+  @media screen and (min-width: 651px) {
+    width: 4vh;
+    height: 4vh;
+    ${(props) =>
+      1 <= props.num && props.num <= 7
+        ? 'border: 0.3vh solid; border-color: #ddd #666 #666 #ddd;'
+        : ''};
+  }
 `
 const StateBoard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 24vh;
-  height: 82vh;
   margin-bottom: 2vh;
+  font-size: 0;
   background-color: #bbb;
   border: 0.5vh solid #666;
+  @media screen and (max-width: 650px) {
+    width: 12vh;
+    height: 42vh;
+  }
+  @media screen and (min-width: 651px) {
+    width: 24vh;
+    height: 82vh;
+  }
 `
 const TextArea = styled.div`
   display: flex;
   width: 20vh;
   margin-top: 2vh;
   font-size: 3vh;
+  @media screen and (max-width: 650px) {
+    width: 10vh;
+    font-size: 1.5vh;
+  }
+  @media screen and (min-width: 651px) {
+    width: 20vh;
+    font-size: 3vh;
+  }
 `
 const GameoverTextArea = styled(TextArea)`
   justify-content: center;
-  font-size: 3.4vh;
   font-weight: bold;
+  @media screen and (max-width: 650px) {
+    font-size: 1.7vh;
+  }
+  @media screen and (min-width: 651px) {
+    font-size: 3.4vh;
+  }
 `
 const NextTetrominoView = styled.div`
   display: inline-block;
-  width: 20vh;
-  height: 20vh;
   background-color: black;
-  border: 2vh solid black;
+  @media screen and (max-width: 650px) {
+    width: 10vh;
+    height: 10vh;
+    border: 1vh solid black;
+  }
+  @media screen and (min-width: 651px) {
+    width: 20vh;
+    height: 20vh;
+    border: 2vh solid black;
+  }
 `
 const Home: NextPage = () => {
   const startBoard = [
@@ -341,7 +392,7 @@ const Home: NextPage = () => {
                 row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
               )}
             </NextTetrominoView>
-            <TextArea>Points: {lineCount}</TextArea>
+            <TextArea>Score: {lineCount}</TextArea>
             <GameoverTextArea>{isGameover ? 'GAME OVER' : ''}</GameoverTextArea>
           </StateBoard>
         </Board>
