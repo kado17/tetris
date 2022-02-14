@@ -353,7 +353,6 @@ const Home: NextPage = () => {
       tmpY++
     }
     setTetrominoY(tmpY)
-    setRestCount(99)
   }
   const moveRight = () => {
     setTetrominoX((e) =>
@@ -445,8 +444,8 @@ const Home: NextPage = () => {
       return
     }
     if (!isOverlayProcessing) {
-      afterFall()
       setIsOverlayProcessing(true)
+      afterFall()
       setEffect(!effect)
     } else {
       nextMinoBoard()
