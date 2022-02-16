@@ -83,11 +83,11 @@ const StateBoard = styled.div`
   border: 0.5vh solid #666;
   @media screen and (max-width: 650px) {
     width: 13vh;
-    height: 28vh;
+    height: 24.5vh;
   }
   @media screen and (min-width: 651px) {
     width: 25vh;
-    height: 57.5vh;
+    height: 52vh;
   }
 `
 const TextArea = styled.div`
@@ -104,7 +104,7 @@ const TextArea = styled.div`
     font-size: 3vh;
   }
 `
-const GameoverTextArea = styled(TextArea)`
+const GameStateTextArea = styled(TextArea)`
   justify-content: center;
   font-weight: bold;
   @media screen and (max-width: 650px) {
@@ -128,24 +128,45 @@ const NextTetrominoView = styled.div`
     border: 2vh solid black;
   }
 `
-const StartButton = styled.div<{ isGameStart: boolean }>`
-  margin: 1vh 0;
+const ButtonTemplate = styled.div`
   color: #111;
   text-align: center;
-  ${(props) => (props.isGameStart ? '' : ' background-color: #888;')}
   @media screen and (max-width: 650px) {
-    width: 12.6vh;
+    width: 12vh;
     height: 3vh;
     font-size: 1.5vh;
     line-height: 2vh;
-    ${(props) =>
-      props.isGameStart ? '' : 'border: 0.5vh solid;border-color: #bbb #666 #666 #bbb;'}
   }
   @media screen and (min-width: 651px) {
     width: 24vh;
     height: 5.5vh;
     font-size: 3vh;
     line-height: 4vh;
+  }
+`
+const PauseButton = styled(ButtonTemplate)`
+  background-color: #888;
+  @media screen and (max-width: 650px) {
+    margin-bottom: 0.5vh;
+    border: 0.5vh solid;
+    border-color: #bbb #666 #666 #bbb;
+  }
+  @media screen and (min-width: 651px) {
+    margin-bottom: 1vh;
+    border: 0.8vh solid;
+    border-color: #bbb #666 #666 #bbb;
+  }
+`
+const StartButton = styled(ButtonTemplate)<{ isGameStart: boolean }>`
+  margin: 1vh 0;
+
+  ${(props) => (props.isGameStart ? '' : ' background-color: #aaa;')}
+
+  @media screen and (max-width: 650px) {
+    ${(props) =>
+      props.isGameStart ? '' : 'border: 0.5vh solid;border-color: #bbb #666 #666 #bbb;'}
+  }
+  @media screen and (min-width: 651px) {
     ${(props) =>
       props.isGameStart ? '' : 'border: 0.8vh solid;border-color: #bbb #666 #666 #bbb;'}
   }
@@ -155,12 +176,12 @@ const Controller = styled.div`
   background-color: #aaa;
   @media screen and (max-width: 650px) {
     width: 13vh;
-    height: 9vh;
+    height: 12.5vh;
     border: 0.5vh solid #666;
   }
   @media screen and (min-width: 651px) {
     width: 25vh;
-    height: 17vh;
+    height: 23vh;
     border: 0.5vh solid #666;
   }
 `
@@ -283,6 +304,7 @@ const Home: NextPage = () => {
   const [isOverlayProcessing, setIsOverlayProcessing] = useState(true)
   const [isGameStart, setIsGameStart] = useState(false)
   const [isGameover, setIsGameover] = useState(false)
+  const [isGameStop, setIsGameStop] = useState(false)
   const [lineCount, setLineCount] = useState(0)
 
   const overlayBoard = () => {
@@ -367,6 +389,12 @@ const Home: NextPage = () => {
 
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
+      if (event.key === 'x') {
+        gamePause()
+        return
+      } else if (isGameStop) {
+        return
+      }
       switch (event.key) {
         case 'ArrowUp':
           rotate()
@@ -382,7 +410,7 @@ const Home: NextPage = () => {
           break
       }
     },
-    [tetromino, tetrominoX, tetrominoY]
+    [tetromino, tetrominoX, tetrominoY, isGameStop]
   )
 
   useEffect(() => {
@@ -396,9 +424,12 @@ const Home: NextPage = () => {
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
-  }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameStart, isGameover])
+  }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameStart, isGameover, isGameStop])
 
   const onClickCbtn = (x: number, y: number) => {
+    if (isGameStop) {
+      return
+    }
     switch ([y, x].toString()) {
       case [0, 1].toString():
         rotate()
@@ -440,7 +471,7 @@ const Home: NextPage = () => {
   }
 
   useEffect(() => {
-    if (!isGameStart || isGameover) {
+    if (!isGameStart || isGameover || isGameStop) {
       return
     }
     if (!isOverlayProcessing) {
@@ -464,10 +495,15 @@ const Home: NextPage = () => {
         setEffect(!effect)
       }, 400)
     }
-  }, [effect, isGameStart])
+  }, [effect, isGameStart, isGameStop])
 
   const gameStart = () => {
     setIsGameStart(true)
+  }
+  const gamePause = () => {
+    if (isGameStart) {
+      setIsGameStop(!isGameStop)
+    }
   }
 
   return (
@@ -491,13 +527,18 @@ const Home: NextPage = () => {
                 )}
               </NextTetrominoView>
               <TextArea>Score: {lineCount}</TextArea>
-              <GameoverTextArea>{isGameover ? 'GAME OVER' : ''}</GameoverTextArea>
+              <GameStateTextArea>
+                {isGameover ? 'GAME OVER' : isGameStop ? 'PAUSE' : ''}
+              </GameStateTextArea>
             </StateBoard>
 
             <StartButton isGameStart={isGameStart} onClick={() => gameStart()}>
               {isGameStart ? '' : 'Game Start'}
             </StartButton>
             <Controller>
+              <PauseButton onClick={() => gamePause()}>
+                {isGameStop ? '[X] : Resume' : '[X] : Pause'}
+              </PauseButton>
               {[
                 ['', '⤵', ''],
                 ['←', '↓', '→'],
