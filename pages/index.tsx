@@ -288,6 +288,7 @@ const Home: NextPage = () => {
   ]
   const startTetrominoX = 4
   const startTetrominoY = 1
+  const defaultFallSpeed = 600
 
   const createTetromino = () => {
     return { block: tetrominoList[Math.floor(Math.random() * tetrominoList.length)], angle: 0 }
@@ -307,6 +308,7 @@ const Home: NextPage = () => {
   const [isGameStop, setIsGameStop] = useState(false)
   const [lineCount, setLineCount] = useState(0)
 
+  //boardとtetrominoを重ねたものを返す
   const overlayBoard = () => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     const tb = tetromino.block[tetromino.angle]
@@ -319,6 +321,7 @@ const Home: NextPage = () => {
     }
     return newBoard
   }
+  //overlayBoardから表示する領域を切り取る
   const viewBoard = useMemo(
     () =>
       overlayBoard()
@@ -326,6 +329,7 @@ const Home: NextPage = () => {
         .map((r) => r.filter((item) => item !== 9)),
     [tetrominoX, tetrominoY, tetromino]
   )
+  //次のテトロミノを表示する二次元配列の生成
   const nextMinoBoard = useCallback(() => {
     const newBoard: number[][] = startNextTetrominoBoard
     const ntb = nextTetromino.block[nextTetromino.angle]
@@ -336,7 +340,7 @@ const Home: NextPage = () => {
     }
     setNextTetrominoBoard(newBoard)
   }, [nextTetromino])
-
+  //テトロミノの衝突判定
   const checkCollision = (movedX: number, movedY: number, mino: number[][], isCallByY = false) => {
     if (isCallByY) {
       if (boardSizeY < movedY + mino.length) {
@@ -412,7 +416,7 @@ const Home: NextPage = () => {
     },
     [tetromino, tetrominoX, tetrominoY, isGameStop]
   )
-
+  //キー入力を受け付ける処理
   useEffect(() => {
     if (!isOverlayProcessing || !isGameStart || isGameover) {
       return
@@ -425,7 +429,7 @@ const Home: NextPage = () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
   }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameStart, isGameover, isGameStop])
-
+  //ボタンクリックで対応する関数を動作させる
   const onClickCbtn = (x: number, y: number) => {
     if (isGameStop) {
       return
@@ -445,7 +449,7 @@ const Home: NextPage = () => {
         break
     }
   }
-
+  //テトロミノが完全に落ち切った後の処理
   const afterFall = () => {
     const ovelBoard = overlayBoard()
     const newBoard: number[][] = []
@@ -469,7 +473,12 @@ const Home: NextPage = () => {
     setTetrominoY(startTetrominoY)
     setNextTetromino(createTetromino())
   }
-
+  //レベル確認
+  const levelOfTetris = () => {
+    const level = Math.floor(lineCount / 5) + 1
+    return level < 10 ? level : 10
+  }
+  //メインループ
   useEffect(() => {
     if (!isGameStart || isGameover || isGameStop) {
       return
@@ -493,9 +502,9 @@ const Home: NextPage = () => {
       }
       setTimeout(() => {
         setEffect(!effect)
-      }, 400)
+      }, defaultFallSpeed - (levelOfTetris() - 1) * 50)
     }
-  }, [effect, isGameStart, isGameStop])
+  }, [effect, isGameStart, isGameStop, lineCount])
 
   const gameStart = () => {
     setIsGameStart(true)
@@ -527,6 +536,7 @@ const Home: NextPage = () => {
                 )}
               </NextTetrominoView>
               <TextArea>Score: {lineCount}</TextArea>
+              <TextArea>Level: {levelOfTetris()}</TextArea>
               <GameStateTextArea>
                 {isGameover ? 'GAME OVER' : isGameStop ? 'PAUSE' : ''}
               </GameStateTextArea>
