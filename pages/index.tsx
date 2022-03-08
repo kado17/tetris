@@ -10,36 +10,35 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: #008080;
+  background-color: lightsteelblue;
 `
 const Board = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
   justify-content: space-around;
-  background-color: #ccc;
+  background-color: lightgray;
   border: 0.8vh solid;
   border-color: #ddd #666 #666 #ddd;
-  @media screen and (max-width: 650px) {
-    width: 40vh;
+  @media screen and (max-width: 860px) {
+    width: 50vh;
     height: 48vh;
   }
-  @media screen and (min-width: 651px) {
-    width: 74vh;
+  @media screen and (min-width: 861px) {
+    width: 100vh;
     height: 88vh;
   }
 `
 const GameBoard = styled.div`
-  margin-bottom: 2vh;
+  margin-top: 2vh;
   font-size: 0;
   background-color: black;
   border: 1vh solid;
   border-color: #666 #ddd #ddd #666;
-  @media screen and (max-width: 650px) {
+  @media screen and (max-width: 860px) {
     width: 22vh;
     height: 42vh;
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
     width: 42vh;
     height: 82vh;
   }
@@ -50,7 +49,7 @@ const TetrominoBlock = styled.div<{ num: number }>`
   background-color: ${(props) =>
     1 <= props.num && props.num <= 7 ? COLORS[props.num - 1] : '#111'};
 
-  @media screen and (max-width: 650px) {
+  @media screen and (max-width: 860px) {
     width: 2vh;
     height: 2vh;
     ${(props) =>
@@ -58,7 +57,7 @@ const TetrominoBlock = styled.div<{ num: number }>`
         ? 'border: 0.2vh solid; border-color: #ddd #666 #666 #ddd;'
         : ''};
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
     width: 4vh;
     height: 4vh;
     ${(props) =>
@@ -71,140 +70,163 @@ const SideArea = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 2vh;
+  margin-top: 2vh;
   font-size: 0;
 `
-const StateBoard = styled.div`
+/*次のテトロミノを表示するエリア*/
+const NextTBoard = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   font-size: 0;
-  background-color: #aaa;
-  border: 0.5vh solid #666;
-  @media screen and (max-width: 650px) {
+  background-color: powderblue;
+
+  @media screen and (max-width: 860px) {
     width: 13vh;
-    height: 24.5vh;
+    height: 14vh;
+    margin-bottom: 7vh;
+    border: 0.4vh solid #666;
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
     width: 25vh;
-    height: 52vh;
+    height: 30vh;
+    margin-bottom: 11vh;
+    border: 0.5vh solid #666;
   }
 `
-const TextArea = styled.div`
+const NextTBoardText = styled.div`
   display: flex;
-  width: 20vh;
-  margin-top: 2vh;
-  font-size: 3vh;
-  @media screen and (max-width: 650px) {
+  text-align: left;
+  @media screen and (max-width: 860px) {
     width: 10vh;
+    margin: 0.3vh 0;
     font-size: 1.5vh;
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
     width: 20vh;
-    font-size: 3vh;
-  }
-`
-const GameStateTextArea = styled(TextArea)`
-  justify-content: center;
-  font-weight: bold;
-  @media screen and (max-width: 650px) {
-    font-size: 1.7vh;
-  }
-  @media screen and (min-width: 651px) {
+    margin: 1vh 0;
     font-size: 3.4vh;
   }
+`
+/*スコアを表示するエリア*/
+const ScoreTextArea = styled(NextTBoardText)`
+  justify-content: center;
+  background-color: powderblue;
+  @media screen and (max-width: 860px) {
+    width: 10vh;
+    padding: 1vh;
+    margin-bottom: 2vh;
+    border: 0.4vh solid #666;
+  }
+  @media screen and (min-width: 861px) {
+    width: 24vh;
+    padding: 2vh;
+    margin-bottom: 3vh;
+    border: 0.5vh solid #666;
+  }
+`
+const GameStateTextArea = styled(ScoreTextArea)`
+  font-weight: bold;
 `
 const NextTetrominoView = styled.div`
   display: inline-block;
   background-color: black;
-  @media screen and (max-width: 650px) {
+  @media screen and (max-width: 860px) {
     width: 10vh;
     height: 10vh;
     border: 1vh solid black;
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
     width: 20vh;
     height: 20vh;
     border: 2vh solid black;
   }
 `
+/*ボタン*/
 const ButtonTemplate = styled.div`
   color: #111;
   text-align: center;
-  @media screen and (max-width: 650px) {
+  @media screen and (max-width: 860px) {
     width: 12vh;
     height: 3vh;
     font-size: 1.5vh;
     line-height: 2vh;
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
     width: 24vh;
-    height: 5.5vh;
-    font-size: 3vh;
-    line-height: 4vh;
+    height: 6vh;
+    font-size: 3.4vh;
+    line-height: 4.5vh;
   }
 `
 const PauseButton = styled(ButtonTemplate)`
-  background-color: #888;
-  @media screen and (max-width: 650px) {
+  background-color: #999;
+  @media screen and (max-width: 860px) {
     margin-bottom: 0.5vh;
-    border: 0.5vh solid;
+    border: 0.3vh solid;
     border-color: #bbb #666 #666 #bbb;
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
     margin-bottom: 1vh;
-    border: 0.8vh solid;
+    border: 0.5vh solid;
     border-color: #bbb #666 #666 #bbb;
   }
 `
 const StartButton = styled(ButtonTemplate)<{ isGameStart: boolean }>`
-  margin: 1vh 0;
-
   ${(props) => (props.isGameStart ? '' : ' background-color: #aaa;')}
-
-  @media screen and (max-width: 650px) {
+  @media screen and (max-width: 860px) {
+    height: 5vh;
+    margin: 1.5vh 0;
+    line-height: 4vh;
     ${(props) =>
       props.isGameStart ? '' : 'border: 0.5vh solid;border-color: #bbb #666 #666 #bbb;'}
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
+    height: 10vh;
+    margin: 3vh 0;
+    line-height: 8.5vh;
     ${(props) =>
-      props.isGameStart ? '' : 'border: 0.8vh solid;border-color: #bbb #666 #666 #bbb;'}
+      props.isGameStart ? '' : 'border: 0.5vh solid;border-color: #bbb #666 #666 #bbb;'}
   }
 `
+/*矢印ボタンの親要素*/
 const Controller = styled.div`
   vertical-align: bottom;
-  background-color: #aaa;
-  @media screen and (max-width: 650px) {
+  background-color: powderblue;
+  @media screen and (max-width: 860px) {
     width: 13vh;
-    height: 12.5vh;
-    border: 0.5vh solid #666;
+    height: 12.75vh;
+    padding: 0.1vh;
+    border: 0.4vh solid #666;
   }
-  @media screen and (min-width: 651px) {
-    width: 25vh;
-    height: 23vh;
+  @media screen and (min-width: 861px) {
+    width: 26vh;
+    height: 25vh;
+    padding: 0.5vh;
     border: 0.5vh solid #666;
   }
 `
+/*矢印ボタン*/
 const ControllerButton = styled.div<{ c: string }>`
   display: inline-block;
   color: black;
   text-align: center;
   vertical-align: top;
-  ${(props) => (props.c === '' ? '' : 'background-color: #888;')}
+  ${(props) => (props.c === '' ? '' : 'background-color: #999;')}
 
-  @media screen and (max-width: 650px) {
+  @media screen and (max-width: 860px) {
     width: 4vh;
     height: 4vh;
     font-size: 2.7vh;
-    line-height: 2.5vh;
-    ${(props) => (props.c === '' ? '' : 'border: 0.6vh solid; border-color: #bbb #666 #666 #bbb;')}
+    line-height: ${(props) => (props.c === '←' || props.c === '→' ? '2.75vh' : '3vh')};
+    ${(props) => (props.c === '' ? '' : 'border: 0.3vh solid; border-color: #bbb #666 #666 #bbb;')}
   }
-  @media screen and (min-width: 651px) {
+  @media screen and (min-width: 861px) {
     width: 8vh;
     height: 8vh;
     font-size: 6.5vh;
-    line-height: 5vh;
-    ${(props) => (props.c === '' ? '' : 'border: 1vh solid; border-color: #bbb #666 #666 #bbb;')}
+    line-height: ${(props) => (props.c === '←' || props.c === '→' ? '6vh' : '6.75vh')};
+    ${(props) => (props.c === '' ? '' : 'border: 0.5vh solid; border-color: #bbb #666 #666 #bbb;')}
   }
 `
 
@@ -287,7 +309,7 @@ const Home: NextPage = () => {
     ],
   ]
   const startTetrominoX = 4
-  const startTetrominoY = 1
+  const startTetrominoY = 2
   const defaultFallSpeed = 600
 
   const createTetromino = () => {
@@ -341,7 +363,13 @@ const Home: NextPage = () => {
     setNextTetrominoBoard(newBoard)
   }, [nextTetromino])
   //テトロミノの衝突判定
-  const checkCollision = (movedX: number, movedY: number, mino: number[][], isCallByY = false) => {
+  const checkCollision = (
+    movedX: number,
+    movedY: number,
+    mino: number[][],
+    isCallByY = false,
+    chackTargetBoard = board
+  ) => {
     if (isCallByY) {
       if (boardSizeY < movedY + mino.length) {
         return false
@@ -350,7 +378,7 @@ const Home: NextPage = () => {
     if (movedX < 0 || boardSizeX < movedX + mino[0].length) {
       return false
     }
-    const newBoard: number[][] = JSON.parse(JSON.stringify(board))
+    const newBoard: number[][] = JSON.parse(JSON.stringify(chackTargetBoard))
     for (let y = 0; y < mino.length; y++) {
       for (let x = 0; x < mino[y].length; x++) {
         if (mino[y][x] > 0 && newBoard[y + movedY][x + movedX] > 0) {
@@ -462,16 +490,17 @@ const Home: NextPage = () => {
       }
     }
     if (
-      !checkCollision(startTetrominoX, startTetrominoY, nextTetromino.block[0]) ||
+      !checkCollision(startTetrominoX, startTetrominoY, nextTetromino.block[0], false, newBoard) ||
       tetrominoY < 3
     ) {
       setIsGameover(true)
+    } else {
+      setTetromino(nextTetromino)
+      setTetrominoX(startTetrominoX)
+      setTetrominoY(startTetrominoY)
+      setNextTetromino(createTetromino())
     }
     setBoard(newBoard)
-    setTetromino(nextTetromino)
-    setTetrominoX(startTetrominoX)
-    setTetrominoY(startTetrominoY)
-    setNextTetromino(createTetromino())
   }
   //レベル確認
   const levelOfTetris = () => {
@@ -522,26 +551,29 @@ const Home: NextPage = () => {
       </Head>
       <Container>
         <Board>
+          <SideArea>
+            <ScoreTextArea>Score : {lineCount}</ScoreTextArea>
+            <ScoreTextArea>Level : {levelOfTetris()}</ScoreTextArea>
+            <GameStateTextArea>
+              {isGameover ? 'GAMEOVER' : isGameStop ? 'PAUSE' : 'Playing!'}
+            </GameStateTextArea>
+          </SideArea>
+
           <GameBoard>
             {viewBoard.map((row, y) =>
               row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
             )}
           </GameBoard>
+
           <SideArea>
-            <StateBoard>
-              <TextArea>Next:</TextArea>
+            <NextTBoard>
+              <NextTBoardText>Next :</NextTBoardText>
               <NextTetrominoView>
                 {nextTetrominoBoard.map((row, y) =>
                   row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
                 )}
               </NextTetrominoView>
-              <TextArea>Score: {lineCount}</TextArea>
-              <TextArea>Level: {levelOfTetris()}</TextArea>
-              <GameStateTextArea>
-                {isGameover ? 'GAME OVER' : isGameStop ? 'PAUSE' : ''}
-              </GameStateTextArea>
-            </StateBoard>
-
+            </NextTBoard>
             <StartButton isGameStart={isGameStart} onClick={() => gameStart()}>
               {isGameStart ? '' : 'Game Start'}
             </StartButton>
