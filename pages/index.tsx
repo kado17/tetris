@@ -266,10 +266,10 @@ const Home: NextPage = () => {
   // prettier-ignore
   const tetrominoList = [
     [
-      [[0, 0, 0, 0], [1, 1, 1, 1],],
-      [[0, 1],[0, 1],[0, 1],[0, 1],],
-      [[0, 0, 0, 0], [1, 1, 1, 1],],
-      [[0, 1],[0, 1],[0, 1],[0, 1],],
+      [[0, 0, 0, 0], [1, 1, 1, 1]],
+      [[0, 1, 0],[0, 1, 0],[0, 1, 0],[0, 1, 0]],
+      [[0, 0, 0, 0], [1, 1, 1, 1]],
+      [[0, 1, 0],[0, 1, 0],[0, 1, 0],[0, 1, 0]],
     ],
     [
       [[0, 2, 2],[0, 2, 2]],
@@ -323,7 +323,7 @@ const Home: NextPage = () => {
   const [tetrominoX, setTetrominoX] = useState(startTetrominoX)
   const [tetrominoY, setTetrominoY] = useState(startTetrominoY)
   const [effect, setEffect] = useState(false)
-  const [restCount, setRestCount] = useState(0)
+  const [noOperationCount, setNoOperationCount] = useState(0)
   const [isOverlayProcessing, setIsOverlayProcessing] = useState(true)
   const [isGameStart, setIsGameStart] = useState(false)
   const [isGameover, setIsGameover] = useState(false)
@@ -393,11 +393,32 @@ const Home: NextPage = () => {
   const rotateAngleLeft = (angle: number) => (0 < angle ? angle - 1 : 3)
 
   const rotate = () => {
-    if (restCount > 1) {
+    if (noOperationCount > 1) {
       return
     }
+    let adjustX = 0
+    const nowMino = tetromino.block[tetromino.angle]
     const rotatedAngle = rotateAngleRight(tetromino.angle)
-    if (checkCollision(tetrominoX, tetrominoY, tetromino.block[rotatedAngle], true)) {
+    //回転に伴う位置調整の確認
+    if (nowMino.flat().some((n) => n === 1) && tetromino.angle % 2 === 1) {
+      if (tetrominoX === 0) {
+        console.log(0)
+        adjustX = 1
+      }
+      if (tetrominoX + nowMino[0].length === boardSizeX - 1) {
+        adjustX = -1
+      }
+      if (tetrominoX + nowMino[0].length === boardSizeX) {
+        adjustX = -2
+      }
+    } else {
+      if (tetrominoX + nowMino[0].length === boardSizeX) {
+        adjustX = -1
+      }
+    }
+    if (checkCollision(tetrominoX + adjustX, tetrominoY, tetromino.block[rotatedAngle], true)) {
+      console.log('R')
+      setTetrominoX((e) => e + adjustX)
       setTetromino({ ...tetromino, angle: rotatedAngle })
     }
   }
@@ -520,13 +541,13 @@ const Home: NextPage = () => {
       nextMinoBoard()
       if (checkCollision(tetrominoX, tetrominoY + 1, tetromino.block[tetromino.angle], true)) {
         setTetrominoY(tetrominoY + 1)
-        setRestCount(0)
+        setNoOperationCount(0)
       } else {
-        if (restCount > 1) {
-          setRestCount(0)
+        if (noOperationCount > 1) {
+          setNoOperationCount(0)
           setIsOverlayProcessing(false)
         } else {
-          setRestCount((e) => e + 1)
+          setNoOperationCount((e) => e + 1)
         }
       }
       setTimeout(() => {
