@@ -232,33 +232,33 @@ const ControllerButton = styled.div<{ c: string }>`
 
 const Home: NextPage = () => {
   const startBoard = [
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     //ここから下が画面に表示
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
-    [9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
+    [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     //ここまで
-    [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
   ]
   const boardSizeX = startBoard[0].length
   const boardSizeY = startBoard.length
@@ -267,9 +267,9 @@ const Home: NextPage = () => {
   const tetrominoList = [
     [
       [[0, 0, 0, 0], [1, 1, 1, 1]],
-      [[0, 1, 0],[0, 1, 0],[0, 1, 0],[0, 1, 0]],
-      [[0, 0, 0, 0], [1, 1, 1, 1]],
-      [[0, 1, 0],[0, 1, 0],[0, 1, 0],[0, 1, 0]],
+      [[0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1]],
+      [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]],
+      [[0, 1],[0, 1],[0, 1],[0, 1]],
     ],
     [
       [[0, 2, 2],[0, 2, 2]],
@@ -308,7 +308,7 @@ const Home: NextPage = () => {
       [[0, 7, 0],[7, 7, 0],[7, 0, 0]],
     ],
   ]
-  const startTetrominoX = 4
+  const startTetrominoX = 5
   const startTetrominoY = 2
   const defaultFallSpeed = 600
 
@@ -401,23 +401,24 @@ const Home: NextPage = () => {
     const rotatedAngle = rotateAngleRight(tetromino.angle)
     //回転に伴う位置調整の確認
     if (nowMino.flat().some((n) => n === 1) && tetromino.angle % 2 === 1) {
-      if (tetrominoX === 0) {
-        console.log(0)
-        adjustX = 1
+      if (!checkCollision(tetrominoX + 1, tetrominoY, nowMino)) {
+        adjustX = tetromino.angle === 1 ? -1 : -2
+      } else if (!checkCollision(tetrominoX - 1, tetrominoY, nowMino)) {
+        adjustX = tetromino.angle === 1 ? 2 : 1
       }
-      if (tetrominoX + nowMino[0].length === boardSizeX - 1) {
-        adjustX = -1
+    } else if (nowMino.flat().some((n) => n !== 2)) {
+      //長い棒以外と正方形以外
+      //現在のテトリミノの一番左列がすべて0(空欄)かどうか
+      if (nowMino.map((item) => item[0]).every((value) => value === 0)) {
+        if (!checkCollision(tetrominoX - 1, tetrominoY, nowMino)) {
+          adjustX = 1
+        }
       }
-      if (tetrominoX + nowMino[0].length === boardSizeX) {
-        adjustX = -2
-      }
-    } else {
-      if (tetrominoX === 0) {
-        console.log(0)
-        adjustX = 1
-      }
-      if (tetrominoX + nowMino[0].length === boardSizeX) {
-        adjustX = -1
+      //現在のテトリミノの一番右列がすべて0(空欄)かどうか
+      else if (nowMino.map((item) => item.slice(-1)[0]).every((value) => value === 0)) {
+        if (!checkCollision(tetrominoX + 1, tetrominoY, nowMino)) {
+          adjustX = -1
+        }
       }
     }
     if (checkCollision(tetrominoX + adjustX, tetrominoY, tetromino.block[rotatedAngle], true)) {
@@ -502,14 +503,14 @@ const Home: NextPage = () => {
         break
     }
   }
-  //テトロミノが完全に落ち切った後の処理
+  //テトリミノが完全に落ち切った後の処理
   const afterFall = () => {
     const ovelBoard = overlayBoard()
     const newBoard: number[][] = []
     for (let row = 0; row < ovelBoard.length; row++) {
       if (ovelBoard[row].every((r) => r > 0) && !ovelBoard[row].every((r) => r === 9)) {
         setLineCount((e) => e + 1)
-        newBoard.unshift([9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9])
+        newBoard.unshift([9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9])
       } else {
         newBoard.push(ovelBoard[row])
       }
