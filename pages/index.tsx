@@ -412,6 +412,10 @@ const Home: NextPage = () => {
         adjustX = -2
       }
     } else {
+      if (tetrominoX === 0) {
+        console.log(0)
+        adjustX = 1
+      }
       if (tetrominoX + nowMino[0].length === boardSizeX) {
         adjustX = -1
       }
