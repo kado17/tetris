@@ -74,13 +74,12 @@ const SideArea = styled.div`
   font-size: 0;
 `
 /*次のテトロミノを表示するエリア*/
-const NextTBoard = styled.div`
+const NextTetorominoArea = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   font-size: 0;
   background-color: powderblue;
-
   @media screen and (max-width: 860px) {
     width: 13vh;
     height: 14vh;
@@ -94,7 +93,7 @@ const NextTBoard = styled.div`
     border: 0.5vh solid #666;
   }
 `
-const NextTBoardText = styled.div`
+const NextTetorominoText = styled.div`
   display: flex;
   text-align: left;
   @media screen and (max-width: 860px) {
@@ -108,8 +107,22 @@ const NextTBoardText = styled.div`
     font-size: 3.4vh;
   }
 `
+const NextTetrominoView = styled.div`
+  display: inline-block;
+  background-color: black;
+  @media screen and (max-width: 860px) {
+    width: 10vh;
+    height: 10vh;
+    border: 1vh solid black;
+  }
+  @media screen and (min-width: 861px) {
+    width: 20vh;
+    height: 20vh;
+    border: 2vh solid black;
+  }
+`
 /*スコアを表示するエリア*/
-const ScoreTextArea = styled(NextTBoardText)`
+const ScoreTextArea = styled(NextTetorominoText)`
   justify-content: center;
   background-color: powderblue;
   @media screen and (max-width: 860px) {
@@ -128,20 +141,6 @@ const ScoreTextArea = styled(NextTBoardText)`
 const GameStateTextArea = styled(ScoreTextArea)`
   font-weight: bold;
 `
-const NextTetrominoView = styled.div`
-  display: inline-block;
-  background-color: black;
-  @media screen and (max-width: 860px) {
-    width: 10vh;
-    height: 10vh;
-    border: 1vh solid black;
-  }
-  @media screen and (min-width: 861px) {
-    width: 20vh;
-    height: 20vh;
-    border: 2vh solid black;
-  }
-`
 /*ボタン*/
 const ButtonTemplate = styled.div`
   color: #111;
@@ -157,19 +156,6 @@ const ButtonTemplate = styled.div`
     height: 6vh;
     font-size: 3.4vh;
     line-height: 4.5vh;
-  }
-`
-const PauseButton = styled(ButtonTemplate)`
-  background-color: #999;
-  @media screen and (max-width: 860px) {
-    margin-bottom: 0.5vh;
-    border: 0.3vh solid;
-    border-color: #bbb #666 #666 #bbb;
-  }
-  @media screen and (min-width: 861px) {
-    margin-bottom: 1vh;
-    border: 0.5vh solid;
-    border-color: #bbb #666 #666 #bbb;
   }
 `
 const StartButton = styled(ButtonTemplate)<{ isGameStart: boolean }>`
@@ -189,7 +175,7 @@ const StartButton = styled(ButtonTemplate)<{ isGameStart: boolean }>`
       props.isGameStart ? '' : 'border: 0.5vh solid;border-color: #bbb #666 #666 #bbb;'}
   }
 `
-/*矢印ボタンの親要素*/
+/*操作ボタンの親要素*/
 const Controller = styled.div`
   vertical-align: bottom;
   background-color: powderblue;
@@ -206,14 +192,26 @@ const Controller = styled.div`
     border: 0.5vh solid #666;
   }
 `
+const PauseButton = styled(ButtonTemplate)`
+  background-color: #999;
+  @media screen and (max-width: 860px) {
+    margin-bottom: 0.5vh;
+    border: 0.3vh solid;
+    border-color: #bbb #666 #666 #bbb;
+  }
+  @media screen and (min-width: 861px) {
+    margin-bottom: 1vh;
+    border: 0.5vh solid;
+    border-color: #bbb #666 #666 #bbb;
+  }
+`
 /*矢印ボタン*/
-const ControllerButton = styled.div<{ c: string }>`
+const ArrowButton = styled.div<{ c: string }>`
   display: inline-block;
   color: black;
   text-align: center;
   vertical-align: top;
   ${(props) => (props.c === '' ? '' : 'background-color: #999;')}
-
   @media screen and (max-width: 860px) {
     width: 4vh;
     height: 4vh;
@@ -592,14 +590,14 @@ const Home: NextPage = () => {
           </GameBoard>
 
           <SideArea>
-            <NextTBoard>
-              <NextTBoardText>Next :</NextTBoardText>
+            <NextTetorominoArea>
+              <NextTetorominoText>Next :</NextTetorominoText>
               <NextTetrominoView>
                 {nextTetrominoBoard.map((row, y) =>
                   row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
                 )}
               </NextTetrominoView>
-            </NextTBoard>
+            </NextTetorominoArea>
             <StartButton isGameStart={isGameStart} onClick={() => gameStart()}>
               {isGameStart ? '' : 'Game Start'}
             </StartButton>
@@ -612,9 +610,9 @@ const Home: NextPage = () => {
                 ['←', '↓', '→'],
               ].map((row, y) =>
                 row.map((c, x) => (
-                  <ControllerButton key={`${x}-${y}`} onClick={() => onClickCbtn(x, y)} c={c}>
+                  <ArrowButton key={`${x}-${y}`} onClick={() => onClickCbtn(x, y)} c={c}>
                     {c}
-                  </ControllerButton>
+                  </ArrowButton>
                 ))
               )}
             </Controller>
