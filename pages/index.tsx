@@ -229,7 +229,7 @@ const ArrowButton = styled.div<{ c: string }>`
 `
 
 const Home: NextPage = () => {
-  const startBoard = [
+  const initGameBoard = [
     [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
     [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -258,11 +258,11 @@ const Home: NextPage = () => {
     //ここまで
     [9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 9],
   ]
-  const boardSizeX = startBoard[0].length
-  const boardSizeY = startBoard.length
-  const startNextTetrominoBoard = Array.from(new Array(4), () => new Array(4).fill(0))
+  const GameBoardwidth = initGameBoard[0].length
+  const GameBoardheight = initGameBoard.length
+  const initNextTetrominoBoard: number[][] = Array.from(new Array(4), () => new Array(4).fill(0))
   // prettier-ignore
-  const tetrominoList = [
+  const tetrominoBlocks = [
     [
       [[0, 0, 0, 0], [1, 1, 1, 1]],
       [[0, 0, 1],[0, 0, 1],[0, 0, 1],[0, 0, 1]],
@@ -306,27 +306,27 @@ const Home: NextPage = () => {
       [[0, 7, 0],[7, 7, 0],[7, 0, 0]],
     ],
   ]
-  const startTetrominoX = 5
-  const startTetrominoY = 2
-  const defaultFallSpeed = 600
+  const initX = 5
+  const initY = 2
+  const initFallSpeed = 600
 
   const createTetromino = () => {
-    return { block: tetrominoList[Math.floor(Math.random() * tetrominoList.length)], angle: 0 }
+    return { block: tetrominoBlocks[Math.floor(Math.random() * tetrominoBlocks.length)], angle: 0 }
   }
 
-  const [board, setBoard] = useState(startBoard)
-  const [nextTetrominoBoard, setNextTetrominoBoard] = useState(startNextTetrominoBoard)
+  const [board, setBoard] = useState(initGameBoard)
+  const [nextTetrominoBoard, setNextTetrominoBoard] = useState(initNextTetrominoBoard)
   const [tetromino, setTetromino] = useState(createTetromino())
   const [nextTetromino, setNextTetromino] = useState(createTetromino())
-  const [tetrominoX, setTetrominoX] = useState(startTetrominoX)
-  const [tetrominoY, setTetrominoY] = useState(startTetrominoY)
+  const [tetrominoX, setTetrominoX] = useState(initX)
+  const [tetrominoY, setTetrominoY] = useState(initY)
   const [effect, setEffect] = useState(false)
   const [noOperationCount, setNoOperationCount] = useState(0)
   const [isOverlayProcessing, setIsOverlayProcessing] = useState(true)
   const [isGameStart, setIsGameStart] = useState(false)
-  const [isGameover, setIsGameover] = useState(false)
-  const [isGameStop, setIsGameStop] = useState(false)
-  const [lineCount, setLineCount] = useState(0)
+  const [isGameOver, setIsGameover] = useState(false)
+  const [isGamePause, setIsGamePause] = useState(false)
+  const [score, setScore] = useState(0)
 
   //boardとtetrominoを重ねたものを返す
   const overlayBoard = () => {
@@ -345,13 +345,13 @@ const Home: NextPage = () => {
   const viewBoard = useMemo(
     () =>
       overlayBoard()
-        .slice(4, boardSizeY)
+        .slice(4, GameBoardheight)
         .map((r) => r.filter((item) => item !== 9)),
     [tetrominoX, tetrominoY, tetromino]
   )
   //次のテトロミノを表示する二次元配列の生成
   const nextMinoBoard = useCallback(() => {
-    const newBoard: number[][] = startNextTetrominoBoard
+    const newBoard: number[][] = initNextTetrominoBoard
     const ntb = nextTetromino.block[nextTetromino.angle]
     for (let y = 0; y < ntb.length; y++) {
       for (let x = 0; x < ntb[y].length; x++) {
@@ -369,11 +369,11 @@ const Home: NextPage = () => {
     chackTargetBoard = board
   ) => {
     if (isCallByY) {
-      if (boardSizeY < movedY + mino.length) {
+      if (GameBoardheight < movedY + mino.length) {
         return false
       }
     }
-    if (movedX < 0 || boardSizeX < movedX + mino[0].length) {
+    if (movedX < 0 || GameBoardwidth < movedX + mino[0].length) {
       return false
     }
     const newBoard: number[][] = JSON.parse(JSON.stringify(chackTargetBoard))
@@ -446,9 +446,9 @@ const Home: NextPage = () => {
   const checkKeyDown = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === 'x') {
-        gamePause()
+        switchIsGamePause()
         return
-      } else if (isGameStop) {
+      } else if (isGamePause) {
         return
       }
       switch (event.key) {
@@ -466,11 +466,11 @@ const Home: NextPage = () => {
           break
       }
     },
-    [tetromino, tetrominoX, tetrominoY, isGameStop]
+    [tetromino, tetrominoX, tetrominoY, isGamePause]
   )
   //キー入力を受け付ける処理
   useEffect(() => {
-    if (!isOverlayProcessing || !isGameStart || isGameover) {
+    if (!isOverlayProcessing || !isGameStart || isGameOver) {
       return
     }
     document.addEventListener('keydown', checkKeyDown, false)
@@ -480,10 +480,10 @@ const Home: NextPage = () => {
     return () => {
       document.removeEventListener('keydown', checkKeyDown, false)
     }
-  }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameStart, isGameover, isGameStop])
+  }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameStart, isGameOver, isGamePause])
   //ボタンクリックで対応する関数を動作させる
   const onClickCbtn = (x: number, y: number) => {
-    if (isGameStop) {
+    if (isGamePause) {
       return
     }
     switch ([y, x].toString()) {
@@ -507,33 +507,30 @@ const Home: NextPage = () => {
     const newBoard: number[][] = []
     for (let row = 0; row < ovelBoard.length; row++) {
       if (ovelBoard[row].every((r) => r > 0) && !ovelBoard[row].every((r) => r === 9)) {
-        setLineCount((e) => e + 1)
+        setScore((e) => e + 1)
         newBoard.unshift([9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9])
       } else {
         newBoard.push(ovelBoard[row])
       }
     }
-    if (
-      !checkCollision(startTetrominoX, startTetrominoY, nextTetromino.block[0], false, newBoard) ||
-      tetrominoY < 3
-    ) {
+    if (!checkCollision(initX, initY, nextTetromino.block[0], false, newBoard) || tetrominoY < 3) {
       setIsGameover(true)
     } else {
       setTetromino(nextTetromino)
-      setTetrominoX(startTetrominoX)
-      setTetrominoY(startTetrominoY)
+      setTetrominoX(initX)
+      setTetrominoY(initY)
       setNextTetromino(createTetromino())
     }
     setBoard(newBoard)
   }
   //レベル確認
   const levelOfTetris = () => {
-    const level = Math.floor(lineCount / 5) + 1
+    const level = Math.floor(score / 5) + 1
     return level < 10 ? level : 10
   }
   //メインループ
   useEffect(() => {
-    if (!isGameStart || isGameover || isGameStop) {
+    if (!isGameStart || isGameOver || isGamePause) {
       return
     }
     if (!isOverlayProcessing) {
@@ -555,16 +552,16 @@ const Home: NextPage = () => {
       }
       setTimeout(() => {
         setEffect(!effect)
-      }, defaultFallSpeed - (levelOfTetris() - 1) * 50)
+      }, initFallSpeed - (levelOfTetris() - 1) * 50)
     }
-  }, [effect, isGameStart, isGameStop, lineCount])
+  }, [effect, isGameStart, isGamePause, score])
 
   const gameStart = () => {
     setIsGameStart(true)
   }
-  const gamePause = () => {
+  const switchIsGamePause = () => {
     if (isGameStart) {
-      setIsGameStop(!isGameStop)
+      setIsGamePause(!isGamePause)
     }
   }
 
@@ -576,19 +573,17 @@ const Home: NextPage = () => {
       <Container>
         <Board>
           <SideArea>
-            <ScoreTextArea>Score : {lineCount}</ScoreTextArea>
+            <ScoreTextArea>Score : {score}</ScoreTextArea>
             <ScoreTextArea>Level : {levelOfTetris()}</ScoreTextArea>
             <GameStateTextArea>
-              {isGameover ? 'GAMEOVER' : isGameStop ? 'PAUSE' : 'Playing!'}
+              {isGameOver ? 'GAMEOVER' : isGamePause ? 'PAUSE' : 'Playing!'}
             </GameStateTextArea>
           </SideArea>
-
           <GameBoard>
             {viewBoard.map((row, y) =>
               row.map((num, x) => <TetrominoBlock key={`${x}-${y}`} num={num}></TetrominoBlock>)
             )}
           </GameBoard>
-
           <SideArea>
             <NextTetorominoArea>
               <NextTetorominoText>Next :</NextTetorominoText>
@@ -602,8 +597,8 @@ const Home: NextPage = () => {
               {isGameStart ? '' : 'Game Start'}
             </StartButton>
             <Controller>
-              <PauseButton onClick={() => gamePause()}>
-                {isGameStop ? '[X] : Resume' : '[X] : Pause'}
+              <PauseButton onClick={() => switchIsGamePause()}>
+                {isGamePause ? '[X] : Resume' : '[X] : Pause'}
               </PauseButton>
               {[
                 ['', '⤵', ''],
