@@ -73,7 +73,7 @@ const SideArea = styled.div`
   margin-top: 2vh;
   font-size: 0;
 `
-/*次のテトロミノを表示するエリア*/
+/*次のテトリミノを表示するエリア*/
 const NextTetorominoArea = styled.div`
   display: flex;
   flex-direction: column;
@@ -349,7 +349,7 @@ const Home: NextPage = () => {
         .map((r) => r.filter((item) => item !== 9)),
     [tetromino, tetrominoX, tetrominoY]
   )
-  //次のテトロミノを表示するエリアの二次元配列の生成
+  //次のテトリミノを表示するエリアの二次元配列の生成
   const changeNextTetrominoBoard = useCallback(() => {
     const newBoard: number[][] = initNextTetrominoBoard
     const ntb = nextTetromino.block[nextTetromino.angle]
@@ -360,7 +360,7 @@ const Home: NextPage = () => {
     }
     setNextTetrominoBoard(newBoard)
   }, [nextTetromino])
-  //テトロミノの衝突判定
+  //テトリミノの衝突判定
   const checkCollision = (
     minoX: number,
     minoY: number,
@@ -369,16 +369,16 @@ const Home: NextPage = () => {
     chackTargetBoard = board
   ) => {
     if (isCheckOverheight) {
-      //テトロミノがy方向にgameBoardをはみ出していないかチェック
+      //テトリミノがy方向にgameBoardをはみ出していないかチェック
       if (GameBoardheight < minoY + mino.length) {
         return false
       }
     }
-    //テトロミノがx方向にgameBoardをはみ出していないかチェック
+    //テトリミノがx方向にgameBoardをはみ出していないかチェック
     if (minoX < 0 || GameBoardwidth < minoX + mino[0].length) {
       return false
     }
-    //テトロミノとgameBoardを重ねて問題がないかチェック
+    //テトリミノとgameBoardを重ねて問題がないかチェック
     const newBoard: number[][] = JSON.parse(JSON.stringify(chackTargetBoard))
     for (let y = 0; y < mino.length; y++) {
       for (let x = 0; x < mino[y].length; x++) {
@@ -402,7 +402,7 @@ const Home: NextPage = () => {
     const rotatedAngle = rotateAngleRight(tetromino.angle)
 
     //回転に伴う位置調整の確認
-    //長い棒のテトロミノのみ
+    //長い棒のテトリミノのみ
     if (nowMino.flat().some((n) => n === 1) && tetromino.angle % 2 === 1) {
       if (!checkCollision(tetrominoX + 1, tetrominoY, nowMino)) {
         adjustX = tetromino.angle === 1 ? -1 : -2
@@ -480,7 +480,7 @@ const Home: NextPage = () => {
       return
     }
     document.addEventListener('keydown', checkKeyDown, false)
-    //テトロミノの回転処理で問題があった場合に修正する処理
+    //テトリミノの回転処理で問題があった場合に修正する処理
     if (!checkCollision(tetrominoX, tetrominoY, tetromino.block[tetromino.angle])) {
       setTetromino({ ...tetromino, angle: rotateAngleLeft(tetromino.angle) })
     }
@@ -553,7 +553,7 @@ const Home: NextPage = () => {
         setTetrominoY(tetrominoY + 1)
         setNoOperationCount(0)
       } else {
-        //テトロミノが落下できない場合の処理
+        //テトリミノが落下できない場合の処理
         if (noOperationCount > 1) {
           setNoOperationCount(0)
           setIsOverlayProcessing(false)
