@@ -10,7 +10,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: center;
   height: 100vh;
-  background-color: lightsteelblue;
+  background-image: url('images/background.png');
 `
 const Board = styled.div`
   display: flex;
@@ -54,7 +54,7 @@ const TetrominoBlock = styled.div<{ num: number }>`
     height: 2vh;
     ${(props) =>
       1 <= props.num && props.num <= 7
-        ? 'border: 0.2vh solid; border-color: #ddd #666 #666 #ddd;'
+        ? 'border: 0.5px solid; border-color: #ddd #666 #666 #ddd;'
         : ''};
   }
   @media screen and (min-width: 861px) {
@@ -62,7 +62,7 @@ const TetrominoBlock = styled.div<{ num: number }>`
     height: 4vh;
     ${(props) =>
       1 <= props.num && props.num <= 7
-        ? 'border: 0.3vh solid; border-color: #ddd #666 #666 #ddd;'
+        ? 'border: 1px solid; border-color: #ddd #666 #666 #ddd;'
         : ''};
   }
 `
