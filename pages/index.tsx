@@ -5,6 +5,11 @@ import styled from 'styled-components'
 
 const COLORS = ['aqua', 'yellow', 'purple', 'blue', 'orange', 'green', 'red']
 
+const ARROWSBTN = [
+  ['', 'images/cached.svg', ''],
+  ['images/arrow_back.svg', 'images/arrow_downward.svg', 'images/arrow_forward.svg'],
+]
+
 const Container = styled.div`
   display: flex;
   align-items: center;
@@ -123,7 +128,9 @@ const NextTetrominoView = styled.div`
 `
 /*スコアを表示するエリア*/
 const ScoreTextArea = styled(NextTetorominoText)`
+  display: flex;
   justify-content: center;
+  text-align: left;
   background-color: powderblue;
   @media screen and (max-width: 860px) {
     width: 10vh;
@@ -145,6 +152,7 @@ const GameStateTextArea = styled(ScoreTextArea)`
 const ButtonTemplate = styled.div`
   color: #111;
   text-align: center;
+  cursor: pointer;
   @media screen and (max-width: 860px) {
     width: 12vh;
     height: 3vh;
@@ -157,6 +165,11 @@ const ButtonTemplate = styled.div`
     font-size: 3.4vh;
     line-height: 4.5vh;
   }
+
+  &:hover {
+    opacity: 0.8;
+    transition: 0.1s;
+  }
 `
 const StartButton = styled(ButtonTemplate)<{ isGameStart: boolean }>`
   ${(props) => (props.isGameStart ? '' : ' background-color: #aaa;')}
@@ -164,21 +177,21 @@ const StartButton = styled(ButtonTemplate)<{ isGameStart: boolean }>`
     height: 5vh;
     margin: 1.5vh 0;
     line-height: 4vh;
-    ${(props) =>
-      props.isGameStart ? '' : 'border: 0.5vh solid;border-color: #bbb #666 #666 #bbb;'}
+    border: 0.4vh solid;
+    border-color: #bbb #666 #666 #bbb;
   }
   @media screen and (min-width: 861px) {
     height: 10vh;
     margin: 3vh 0;
     line-height: 8.5vh;
-    ${(props) =>
-      props.isGameStart ? '' : 'border: 0.5vh solid;border-color: #bbb #666 #666 #bbb;'}
+    border: 0.5vh solid;
+    border-color: #bbb #666 #666 #bbb;
   }
 `
 /*操作ボタンの親要素*/
 const Controller = styled.div`
   vertical-align: bottom;
-  background-color: powderblue;
+  background-color: clear;
   @media screen and (max-width: 860px) {
     width: 13vh;
     height: 12.75vh;
@@ -193,38 +206,39 @@ const Controller = styled.div`
   }
 `
 const PauseButton = styled(ButtonTemplate)`
+  color: black;
   background-color: #999;
   @media screen and (max-width: 860px) {
     margin-bottom: 0.5vh;
-    border: 0.3vh solid;
-    border-color: #bbb #666 #666 #bbb;
+    border: 0.3vh solid lightgray;
   }
   @media screen and (min-width: 861px) {
     margin-bottom: 1vh;
-    border: 0.5vh solid;
-    border-color: #bbb #666 #666 #bbb;
+    border: 0.5vh solid lightgray;
   }
 `
 /*矢印ボタン*/
-const ArrowButton = styled.div<{ c: string }>`
+const ArrowButton = styled.img<{ c: string }>`
   display: inline-block;
-  color: black;
   text-align: center;
   vertical-align: top;
-  ${(props) => (props.c === '' ? '' : 'background-color: #999;')}
+  cursor: pointer;
+  ${(props) => (props.c === '' ? 'visibility:hidden;' : 'background-color: #999;')}
+
   @media screen and (max-width: 860px) {
     width: 4vh;
     height: 4vh;
-    font-size: 2.7vh;
-    line-height: ${(props) => (props.c === '←' || props.c === '→' ? '2.75vh' : '3vh')};
-    ${(props) => (props.c === '' ? '' : 'border: 0.3vh solid; border-color: #bbb #666 #666 #bbb;')}
+    ${(props) => (props.c === '' ? '' : 'border: 0.3vh solid lightgray;')}
   }
   @media screen and (min-width: 861px) {
     width: 8vh;
     height: 8vh;
-    font-size: 6.5vh;
-    line-height: ${(props) => (props.c === '←' || props.c === '→' ? '6vh' : '6.75vh')};
-    ${(props) => (props.c === '' ? '' : 'border: 0.5vh solid; border-color: #bbb #666 #666 #bbb;')}
+    ${(props) => (props.c === '' ? '' : 'border: 0.5vh solid lightgray;')}
+  }
+
+  &:hover {
+    opacity: 0.8;
+    transition: 0.1s;
   }
 `
 
@@ -394,9 +408,8 @@ const Home: NextPage = () => {
   const rotateAngleLeft = (angle: number) => (0 < angle ? angle - 1 : 3)
 
   const rotate = () => {
-    if (noOperationCount > 1) {
-      return
-    }
+    if (noOperationCount > 1) return
+
     let adjustX = 0
     const nowMino = tetromino.block[tetromino.angle]
     const rotatedAngle = rotateAngleRight(tetromino.angle)
@@ -490,7 +503,7 @@ const Home: NextPage = () => {
   }, [tetromino, tetrominoX, tetrominoY, isOverlayProcessing, isGameStart, isGameOver, isGamePause])
   //ボタンクリックで対応する関数を動作させる
   const onClickCbtn = (x: number, y: number) => {
-    if (isGamePause) {
+    if (isGamePause || !isGameStart || isGameOver) {
       return
     }
     switch ([y, x].toString()) {
@@ -567,13 +580,13 @@ const Home: NextPage = () => {
     }
   }, [effect, isGameStart, isGamePause, score])
 
-  const gameStart = () => {
-    setIsGameStart(true)
-  }
   const switchIsGamePause = () => {
-    if (isGameStart) {
-      setIsGamePause(!isGamePause)
-    }
+    if (isGameStart) setIsGamePause(!isGamePause)
+  }
+
+  const startOrReset = () => {
+    if (isGameStart) window.location.reload()
+    else setIsGameStart(true)
   }
 
   return (
@@ -604,21 +617,21 @@ const Home: NextPage = () => {
                 )}
               </NextTetrominoView>
             </NextTetorominoArea>
-            <StartButton isGameStart={isGameStart} onClick={() => gameStart()}>
-              {isGameStart ? '' : 'Game Start'}
+            <StartButton isGameStart={isGameStart} onClick={() => startOrReset()}>
+              {isGameStart ? 'Reset' : 'Game Start'}
             </StartButton>
             <Controller>
               <PauseButton onClick={() => switchIsGamePause()}>
                 {isGamePause ? '[X] : Resume' : '[X] : Pause'}
               </PauseButton>
-              {[
-                ['', '⤵', ''],
-                ['←', '↓', '→'],
-              ].map((row, y) =>
+              {ARROWSBTN.map((row, y) =>
                 row.map((c, x) => (
-                  <ArrowButton key={`${x}-${y}`} onClick={() => onClickCbtn(x, y)} c={c}>
-                    {c}
-                  </ArrowButton>
+                  <ArrowButton
+                    key={`${x}-${y}`}
+                    onClick={() => onClickCbtn(x, y)}
+                    c={c}
+                    src={c !== '' ? c : 'images/arrow_back.svg'}
+                  ></ArrowButton>
                 ))
               )}
             </Controller>
