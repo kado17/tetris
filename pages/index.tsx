@@ -247,7 +247,22 @@ const ArrowButton = styled.img<{ c: string }>`
     transition: 0.1s;
   }
 `
+const OpenManualButton = styled.div`
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  padding: 15px 20px;
+  font-family: bold;
+  color: #fff;
+  cursor: pointer;
+  background-color: black;
+  border-radius: 20%;
 
+  &:hover {
+    opacity: 0.8;
+    transition: 0.1s;
+  }
+`
 const Home: NextPage = () => {
   const initGameBoard = [
     [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -598,9 +613,12 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Pseudo-Tetris </title>
+        <title>Pseudo-Tetris</title>
       </Head>
       <Container>
+        <OpenManualButton onClick={() => window.open('images/manual.png', '_blank', 'noreferrer')}>
+          Manual
+        </OpenManualButton>
         <Board>
           <SideArea>
             <ScoreTextArea>Score : {score}</ScoreTextArea>
@@ -626,7 +644,6 @@ const Home: NextPage = () => {
                 )}
               </NextTetrominoView>
             </NextTetorominoArea>
-
             <Controller>
               <PauseButton onClick={() => switchIsGamePause()}>
                 {isGamePause ? '[X] : Resume' : '[X] : Pause'}
