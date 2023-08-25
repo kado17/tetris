@@ -25,7 +25,7 @@ const Board = styled.div`
   border: 0.8vh solid;
   border-color: #ddd #666 #666 #ddd;
   @media screen and (max-width: 860px) {
-    width: 50vh;
+    width: 54vh;
     height: 48vh;
   }
   @media screen and (min-width: 861px) {
@@ -88,13 +88,13 @@ const NextTetorominoArea = styled.div`
   @media screen and (max-width: 860px) {
     width: 13vh;
     height: 14vh;
-    margin-bottom: 7vh;
+    margin: 1vh 0 13vh;
     border: 0.4vh solid #666;
   }
   @media screen and (min-width: 861px) {
     width: 25vh;
     height: 30vh;
-    margin-bottom: 11vh;
+    margin: 1vh 0 25vh;
     border: 0.5vh solid #666;
   }
 `
@@ -133,7 +133,7 @@ const ScoreTextArea = styled(NextTetorominoText)`
   text-align: left;
   background-color: powderblue;
   @media screen and (max-width: 860px) {
-    width: 10vh;
+    width: 12vh;
     padding: 1vh;
     margin-bottom: 2vh;
     border: 0.4vh solid #666;
@@ -154,38 +154,33 @@ const ButtonTemplate = styled.div`
   text-align: center;
   cursor: pointer;
   @media screen and (max-width: 860px) {
-    width: 12vh;
-    height: 3vh;
     font-size: 1.5vh;
-    line-height: 2vh;
   }
   @media screen and (min-width: 861px) {
-    width: 24vh;
-    height: 6vh;
     font-size: 3.4vh;
-    line-height: 4.5vh;
-  }
-
-  &:hover {
-    opacity: 0.8;
-    transition: 0.1s;
   }
 `
 const StartButton = styled(ButtonTemplate)<{ isGameStart: boolean }>`
-  ${(props) => (props.isGameStart ? '' : ' background-color: #aaa;')}
+  background-color: #aaa;
+  border-radius: 4px;
   @media screen and (max-width: 860px) {
-    height: 5vh;
-    margin: 1.5vh 0;
-    line-height: 4vh;
-    border: 0.4vh solid;
-    border-color: #bbb #666 #666 #bbb;
+    width: 10vh;
+    height: 4vh;
+    margin-top: 16vh;
+    line-height: 3.5vh;
+    border: 0.2vh solid #666;
   }
   @media screen and (min-width: 861px) {
-    height: 10vh;
-    margin: 3vh 0;
-    line-height: 8.5vh;
-    border: 0.5vh solid;
-    border-color: #bbb #666 #666 #bbb;
+    width: 22vh;
+    height: 8vh;
+    margin-top: 32.5vh;
+    line-height: 6.75vh;
+    border: 0.3vh solid #666;
+  }
+
+  &:hover {
+    opacity: 0.7;
+    transition: 0.1s;
   }
 `
 /*操作ボタンの親要素*/
@@ -209,12 +204,23 @@ const PauseButton = styled(ButtonTemplate)`
   color: black;
   background-color: #999;
   @media screen and (max-width: 860px) {
+    width: 12vh;
+    height: 3vh;
     margin-bottom: 0.5vh;
+    line-height: 2vh;
     border: 0.3vh solid lightgray;
   }
   @media screen and (min-width: 861px) {
+    width: 24vh;
+    height: 6vh;
     margin-bottom: 1vh;
+    line-height: 4.5vh;
     border: 0.5vh solid lightgray;
+  }
+
+  &:hover {
+    opacity: 0.8;
+    transition: 0.1s;
   }
 `
 /*矢印ボタン*/
@@ -602,6 +608,9 @@ const Home: NextPage = () => {
             <GameStateTextArea>
               {isGameOver ? 'GAMEOVER' : isGamePause ? 'PAUSE' : 'Playing!'}
             </GameStateTextArea>
+            <StartButton isGameStart={isGameStart} onClick={() => startOrReset()}>
+              {isGameStart ? 'Reset' : 'Game Start'}
+            </StartButton>
           </SideArea>
           <GameBoard>
             {viewBoard.map((row, y) =>
@@ -617,9 +626,7 @@ const Home: NextPage = () => {
                 )}
               </NextTetrominoView>
             </NextTetorominoArea>
-            <StartButton isGameStart={isGameStart} onClick={() => startOrReset()}>
-              {isGameStart ? 'Reset' : 'Game Start'}
-            </StartButton>
+
             <Controller>
               <PauseButton onClick={() => switchIsGamePause()}>
                 {isGamePause ? '[X] : Resume' : '[X] : Pause'}
