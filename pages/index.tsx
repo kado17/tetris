@@ -263,6 +263,60 @@ const OpenManualButton = styled.div`
     transition: 0.1s;
   }
 `
+const Overlay = styled.div<{ isOpen: boolean }>`
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(0 0 0 / 70%);
+
+  ${(props) => (props.isOpen ? `display:block;` : '')}
+`
+const Modal = styled.div`
+  position: absolute;
+  top: 10%;
+  right: 10%;
+  z-index: 2;
+  display: flex;
+  width: 80%;
+  height: 80%;
+  background-color: #fff;
+  border-radius: 10px;
+`
+const Manual = styled.img`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  width: 80%;
+  cursor: pointer;
+  border: 2px solid black;
+  transform: translateY(-50%) translateX(-50%);
+
+  &:hover {
+    opacity: 0.8;
+    transition: 0.1s;
+  }
+`
+const CloseButton = styled.div`
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  z-index: 3;
+  font-size: 200%;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    opacity: 0.8;
+    transition: 0.1s;
+  }
+`
 const Home: NextPage = () => {
   const initGameBoard = [
     [9, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9],
@@ -362,6 +416,7 @@ const Home: NextPage = () => {
   const [isGameOver, setIsGameover] = useState(false)
   const [isGamePause, setIsGamePause] = useState(false)
   const [score, setScore] = useState(0)
+  const [isOpenModal, setIsOpenModal] = useState(false)
 
   //boardとtetrominoを重ねたものを返す
   const overlayBoard = () => {
@@ -616,9 +671,17 @@ const Home: NextPage = () => {
         <title>Pseudo-Tetris</title>
       </Head>
       <Container>
-        <OpenManualButton onClick={() => window.open('images/manual.png', '_blank', 'noreferrer')}>
-          Manual
-        </OpenManualButton>
+        <OpenManualButton onClick={() => setIsOpenModal(true)}>Manual</OpenManualButton>
+        <Overlay isOpen={isOpenModal}>
+          <Modal>
+            <CloseButton onClick={() => setIsOpenModal(false)}>×</CloseButton>
+            <Manual
+              src="images/manual.png"
+              loading="lazy"
+              onClick={() => window.open('images/manual.png', '_blank', 'noreferrer')}
+            ></Manual>
+          </Modal>
+        </Overlay>
         <Board>
           <SideArea>
             <ScoreTextArea>Score : {score}</ScoreTextArea>
